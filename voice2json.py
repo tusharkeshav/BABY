@@ -8,6 +8,7 @@ import timer
 from text2speech import speak
 import weather
 import date_time
+# from log import log
 
 
 def run(cmd):
@@ -68,7 +69,8 @@ def voice2json():
         t1.start()
 
     elif intent == 'StopWatch':
-        t1 = Thread(target=stopwatch.main())
+        t1 = Thread(target=stopwatch.main)
+        t1.start()
 
 
     else:
