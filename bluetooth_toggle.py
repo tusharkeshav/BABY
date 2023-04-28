@@ -1,4 +1,4 @@
-from voice2json import *
+from voice2intent import *
 
 
 def run(cmd) -> list:

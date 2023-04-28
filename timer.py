@@ -1,5 +1,4 @@
 import tkinter as tk
-import notify2
 
 
 class Timer:
@@ -135,6 +134,7 @@ class Timer:
         else:
             # Stop the timer if the time has run out
             self.stop()
+            import notify2
             notify2.init('Assistant')
             noti = notify2.Notification("Timer", "Timer is completed").show()
             exit(0)

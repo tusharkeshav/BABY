@@ -1,5 +1,5 @@
 import random
-from voice2json import *
+from voice2intent import *
 
 
 def dice_roll():
