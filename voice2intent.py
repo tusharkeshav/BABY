@@ -34,26 +34,33 @@ def voice_2_intent():
         cmd = 'gnome-terminal'
         run(cmd)
 
-    elif intent == 'SetBrightness':
+    elif intent == 'Brightness':
         value = str(voice2json['slots'].get('brightness', 0))
         speak('Changing bright Brightness to {value}'.format(value=value))
         curr_brightness = change_brightness.get_brightness()
         print('value is {}'.format(value))
         if int(curr_brightness) > int(value):
-            speak('Increaing brightness to {value}'.format(value=value))
+            speak('Increasing brightness to {value}'.format(value=value))
         else:
             speak(f'Decreasing brightness to {value}'.format(value=value))
         change_brightness.increase_brightness(value)
 
-    elif intent == 'IncreaseBrightness':
-        value = str(voice2json['slots'].get('brightness', 0))
-        speak('Increasing Brightness')
-        change_brightness.decrease_brightness()
-
-    elif intent == 'DecreaseBrightness':
-        value = str(voice2json['slots'].get('brightness', 0))
-        speak('Increasing Brightness')
-        change_brightness.increase_brightness(value)
+    elif intent == 'Brightness':
+        if 'increase' in voice2json['slots']:  # increase
+            speak('Increasing Brightness')
+            SUBMIT_JOB.submit(change_brightness.increase_brightness)
+        elif 'decrease' in voice2json['slots']:  # decrease
+            SUBMIT_JOB.submit(change_brightness.decrease_brightness)
+        elif 'brightness' in voice2json['slots']:  # set
+            value = str(voice2json['slots'].get('brightness', 0))
+            speak('Changing bright Brightness to {value}'.format(value=value))
+            curr_brightness = change_brightness.get_brightness()
+            print('value is {}'.format(value))
+            if int(curr_brightness) > int(value):
+                speak('Increasing brightness to {value}'.format(value=value))
+            else:
+                speak(f'Decreasing brightness to {value}'.format(value=value))
+            SUBMIT_JOB.submit(change_brightness.increase_brightness, value)
 
     elif intent == 'CheckWeather':
         weather.get_weather()
