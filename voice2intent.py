@@ -35,7 +35,7 @@ def voice_2_intent():
     # record = run('timeout 5 arecord -q -r 16000 -c 1 -f S16_LE -t wav /tmp/abc.wav')
     # voice2json = run('/usr/bin/voice2json transcribe-wav < /tmp/abc.wav | voice2json recognize-intent')
     voice2json = run1('/usr/bin/arecord -q -r 16000 -c 1 -f S16_LE -t raw | /usr/bin/voice2json transcribe-stream -c 1 '
-                      '-a - | /usr/bin/voice2json recognize-intent ')
+                      '-a - --wave-sink /tmp/save.wav | /usr/bin/voice2json recognize-intent ')
     # print(voice2json[1].split('\n'))
     voice2json = json.loads(voice2json[1].split('\n')[7])
     print(f"Generated voice command: {voice2json}")
@@ -124,7 +124,7 @@ def voice_2_intent():
                 speak('Increasing sound to {value}'.format(value=value))
             else:
                 speak('Decreasing sound to {value}'.format(value=value))
-            SUBMIT_JOB.submit(change_brightness.increase_brightness, value)
+            SUBMIT_JOB.submit(volume.change_volume, value)
         pass
     elif intent == 'Bluetooth':
         import bluetooth_toggle
@@ -133,6 +133,12 @@ def voice_2_intent():
         elif 'off' in voice2json['slots']['action']:
             print('Turning off bluetooth')
             SUBMIT_JOB.submit(bluetooth_toggle.bluetooth_OFF)
+
+    elif intent == 'SearchSong':
+        import recognition
+        SUBMIT_JOB.submit(recognition.recognize, '/tmp/save.wav')
+        speak('Searching Youtube for you.')
+
 
 
 
