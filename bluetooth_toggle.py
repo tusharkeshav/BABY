@@ -37,5 +37,3 @@ def bluetooth_STATUS():
         print('Bluetooth is turned on')
         speak('Bluetooth is ON')
     pass
-
-bluetooth_STATUS()

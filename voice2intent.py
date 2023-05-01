@@ -1,6 +1,7 @@
 import json
 import subprocess
 # from log import log
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 import change_brightness
@@ -11,6 +12,7 @@ import random_number
 import roll_dice
 import stopwatch
 import timer
+import volume
 import weather
 from text2speech import speak
 
@@ -22,38 +24,39 @@ def run(cmd):
     return output
 
 
+def run1(cmd):
+    output = subprocess.getstatusoutput(cmd)
+    return output
+
+
 def voice_2_intent():
-    speak('Recording voice')
-    record = run('timeout 5 arecord -q -r 16000 -c 1 -f S16_LE -t wav /tmp/abc.wav')
-    voice2json = run('/usr/bin/voice2json transcribe-wav < /tmp/abc.wav | voice2json recognize-intent')
-    voice2json = json.loads(voice2json)
-    print(voice2json)
+    print('Recording voice')
+    time.sleep(0.5)
+    # record = run('timeout 5 arecord -q -r 16000 -c 1 -f S16_LE -t wav /tmp/abc.wav')
+    # voice2json = run('/usr/bin/voice2json transcribe-wav < /tmp/abc.wav | voice2json recognize-intent')
+    voice2json = run1('/usr/bin/arecord -q -r 16000 -c 1 -f S16_LE -t raw | /usr/bin/voice2json transcribe-stream -c 1 '
+                      '-a - | /usr/bin/voice2json recognize-intent ')
+    # print(voice2json[1].split('\n'))
+    voice2json = json.loads(voice2json[1].split('\n')[7])
+    print(f"Generated voice command: {voice2json}")
     intent = str(voice2json['intent']['name'])
     if intent == 'Terminal':
         speak('Opening terminal')
         cmd = 'gnome-terminal'
         run(cmd)
 
-    elif intent == 'Brightness':
-        value = str(voice2json['slots'].get('brightness', 0))
-        speak('Changing bright Brightness to {value}'.format(value=value))
-        curr_brightness = change_brightness.get_brightness()
-        print('value is {}'.format(value))
-        if int(curr_brightness) > int(value):
-            speak('Increasing brightness to {value}'.format(value=value))
-        else:
-            speak(f'Decreasing brightness to {value}'.format(value=value))
-        change_brightness.increase_brightness(value)
 
     elif intent == 'Brightness':
-        if 'increase' in voice2json['slots']:  # increase
+        print(voice2json['slots'])
+        if 'increase' in voice2json['slots']['action']:  # increase
             speak('Increasing Brightness')
             SUBMIT_JOB.submit(change_brightness.increase_brightness)
-        elif 'decrease' in voice2json['slots']:  # decrease
+        elif 'decrease' in voice2json['slots']['action']:  # decrease
             SUBMIT_JOB.submit(change_brightness.decrease_brightness)
-        elif 'brightness' in voice2json['slots']:  # set
+        elif 'brightness' in voice2json['slots']['action']:  # set
             value = str(voice2json['slots'].get('brightness', 0))
             speak('Changing bright Brightness to {value}'.format(value=value))
+            print('Changing bright Brightness to {value}'.format(value=value))
             curr_brightness = change_brightness.get_brightness()
             print('value is {}'.format(value))
             if int(curr_brightness) > int(value):
@@ -105,7 +108,33 @@ def voice_2_intent():
             SUBMIT_JOB.submit(media.previous_media)
 
     elif intent == 'Volume':
+        if 'action' in voice2json['slots']:
+            if 'increase' in voice2json['slots']['action']:  # increase
+                speak('Increasing Volume')
+                SUBMIT_JOB.submit(volume.increase_volume())
+            elif 'decrease' in voice2json['slots']['action']:  # decrease
+                SUBMIT_JOB.submit(volume.decrease_volume())
+        elif 'sound' in voice2json['slots']:  # set
+            value = str(voice2json['slots'].get('sound', 0))
+            speak('Changing sound to {value}'.format(value=value))
+            print('Changing sound to {value}'.format(value=value))
+            curr_sound = volume.get_volume()
+            print('value is {}'.format(value))
+            if int(curr_sound) > int(value):
+                speak('Increasing sound to {value}'.format(value=value))
+            else:
+                speak('Decreasing sound to {value}'.format(value=value))
+            SUBMIT_JOB.submit(change_brightness.increase_brightness, value)
         pass
+    elif intent == 'Bluetooth':
+        import bluetooth_toggle
+        if 'on' in voice2json['slots']['action']:
+            SUBMIT_JOB.submit(bluetooth_toggle.bluetooth_ON)
+        elif 'off' in voice2json['slots']['action']:
+            print('Turning off bluetooth')
+            SUBMIT_JOB.submit(bluetooth_toggle.bluetooth_OFF)
+
+
 
 
 
