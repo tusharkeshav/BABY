@@ -1,6 +1,7 @@
 import speech_recognition as sr
 import webbrowser
 from text2speech import speak
+from internet import check_internet
 
 keyword_delete = ['find', 'play', 'youtube', 'music', 'search song on', 'search song', 'search']
 
@@ -25,3 +26,7 @@ def recognize(file):
         speak('Following are the search results.')
     except Exception as e:
         print(f"Exception while recognizing text. Exception: {e}")
+
+
+def search_youtube(file):
+    recognize(file) if check_internet() else speak("I am finding difficulty while connecting to Internet")

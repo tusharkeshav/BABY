@@ -24,27 +24,33 @@ def run(cmd):
     return output
 
 
-def run1(cmd):
+def run_output(cmd):
     output = subprocess.getstatusoutput(cmd)
     return output
 
 
-def voice_2_intent():
+def record_analyse():
     print('Recording voice')
     time.sleep(0.5)
     # record = run('timeout 5 arecord -q -r 16000 -c 1 -f S16_LE -t wav /tmp/abc.wav')
     # voice2json = run('/usr/bin/voice2json transcribe-wav < /tmp/abc.wav | voice2json recognize-intent')
-    voice2json = run1('/usr/bin/arecord -q -r 16000 -c 1 -f S16_LE -t raw | /usr/bin/voice2json transcribe-stream -c 1 '
-                      '-a - --wave-sink /tmp/save.wav | /usr/bin/voice2json recognize-intent ')
+    voice2json = run_output(
+        '/usr/bin/arecord -q -r 16000 -c 1 -f S16_LE -t raw | /usr/bin/voice2json transcribe-stream -c 1 '
+        '-a - --wave-sink /tmp/save.wav | /usr/bin/voice2json recognize-intent ')
     # print(voice2json[1].split('\n'))
     voice2json = json.loads(voice2json[1].split('\n')[7])
     print(f"Generated voice command: {voice2json}")
+
     intent = str(voice2json['intent']['name'])
+    return intent, voice2json
+
+
+def voice_2_intent():
+    intent, voice2json = record_analyse()
     if intent == 'Terminal':
         speak('Opening terminal')
         cmd = 'gnome-terminal'
         run(cmd)
-
 
     elif intent == 'Brightness':
         print(voice2json['slots'])
@@ -136,13 +142,8 @@ def voice_2_intent():
 
     elif intent == 'SearchSong':
         import recognition
-        SUBMIT_JOB.submit(recognition.recognize, '/tmp/save.wav')
+        SUBMIT_JOB.submit(recognition.search_youtube, '/tmp/save.wav')
         speak('Searching Youtube for you.')
 
-
-
-
-
-
     else:
-        speak('Command not found')
+        speak('Sorry I don\'t understand this. Can you please repeat')
