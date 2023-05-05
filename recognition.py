@@ -1,12 +1,15 @@
 import speech_recognition as sr
-import webbrowser
-from text2speech import speak
-from internet import check_internet
 
-keyword_delete = ['find', 'play', 'youtube', 'music', 'search song on', 'search song', 'search']
+keyword_delete = ['find', 'play', 'youtube', 'music', 'search song on', 'search song', 'search', 'song on', 'spotify']
 
 
-def recognize(file):
+def recognize(file, filter_keywords):
+    """
+    Recognize the input file(audio) and convert it to text
+    :param file: audion file. Default location is /tmp/save.wav
+    :param filter_keywords: If you require to filter some keywords from the resultant speech. its is required to search song on youtube etc
+    :return: text translation of speech
+    """
     r = sr.Recognizer()
     audio_data = sr.AudioFile(file)
 
@@ -19,14 +22,10 @@ def recognize(file):
         print('recognizing data')
         query = str(r.recognize_google(audio)).lower()
         query = str('search song on YouTube Naino wale Ne Cheda Man Ka Pyala').lower()
-        for word in keyword_delete:
-            query = query.replace(word, '')
+        if filter_keywords:
+            for word in keyword_delete:
+                query = query.replace(word, '')
         print(query)
-        webbrowser.open('https://www.youtube.com/results?search_query={search}'.format(search=query))
-        speak('Following are the search results.')
+        return query
     except Exception as e:
         print(f"Exception while recognizing text. Exception: {e}")
-
-
-def search_youtube(file):
-    recognize(file) if check_internet() else speak("I am finding difficulty while connecting to Internet")

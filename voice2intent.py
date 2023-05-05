@@ -17,6 +17,7 @@ import weather
 from text2speech import speak
 
 SUBMIT_JOB = ThreadPoolExecutor(max_workers=5)
+RECORD_FILE = '/tmp/save.wav'
 
 
 def run(cmd):
@@ -30,13 +31,17 @@ def run_output(cmd):
 
 
 def record_analyse():
+    """
+    Record and feed to intent recognition.
+    :return:
+    """
     print('Recording voice')
     time.sleep(0.5)
     # record = run('timeout 5 arecord -q -r 16000 -c 1 -f S16_LE -t wav /tmp/abc.wav')
     # voice2json = run('/usr/bin/voice2json transcribe-wav < /tmp/abc.wav | voice2json recognize-intent')
     voice2json = run_output(
         '/usr/bin/arecord -q -r 16000 -c 1 -f S16_LE -t raw | /usr/bin/voice2json transcribe-stream -c 1 '
-        '-a - --wave-sink /tmp/save.wav | /usr/bin/voice2json recognize-intent ')
+        '-a - --wav-sink {wav_file} | /usr/bin/voice2json recognize-intent '.format(wav_file=RECORD_FILE))
     # print(voice2json[1].split('\n'))
     voice2json = json.loads(voice2json[1].split('\n')[7])
     print(f"Generated voice command: {voice2json}")
@@ -45,7 +50,23 @@ def record_analyse():
     return intent, voice2json
 
 
+def indentify_intent(force=True):
+    """
+    It will be used when its required for accuracy. For accuracy we will first send voice command
+    to speech2text recognizer then from that analyzing intent. It ensure highest accuracy.
+    :param force:
+    :return: intent
+    """
+    import recognition
+    query = recognition.recognize(RECORD_FILE, filter_keywords=False)
+    intent = run_output(f'/usr/bin/voice2json recognize-intent --text-input {query}')
+
+
 def voice_2_intent():
+    """
+    Action that will be performed. In other words, it mainitain all the skills
+    :return:
+    """
     intent, voice2json = record_analyse()
     if intent == 'Terminal':
         speak('Opening terminal')
@@ -141,9 +162,17 @@ def voice_2_intent():
             SUBMIT_JOB.submit(bluetooth_toggle.bluetooth_OFF)
 
     elif intent == 'SearchSong':
-        import recognition
-        SUBMIT_JOB.submit(recognition.search_youtube, '/tmp/save.wav')
-        speak('Searching Youtube for you.')
+        if 'youtube' in voice2json['slots']['app']:
+            import youtube
+            SUBMIT_JOB.submit(youtube.search_song, RECORD_FILE)
+        elif 'spotify' in voice2json['slots']['app']:
+            import spotify
+            SUBMIT_JOB.submit(spotify.search_song, RECORD_FILE)
+            speak('Searching Spotify for you.')
+
+    elif intent == 'SearchSpotify':
+        import spotify
+        SUBMIT_JOB.submit(spotify.search_song, RECORD_FILE)
 
     else:
         speak('Sorry I don\'t understand this. Can you please repeat')
