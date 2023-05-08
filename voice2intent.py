@@ -3,9 +3,9 @@ import subprocess
 # from log import log
 import time
 from concurrent.futures import ThreadPoolExecutor
+from playsound import playsound
 
 import change_brightness
-import coin_flip
 import date_time
 import media
 import random_number
@@ -16,7 +16,7 @@ import volume
 import weather
 from text2speech import speak
 
-SUBMIT_JOB = ThreadPoolExecutor(max_workers=5)
+SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
 RECORD_FILE = '/tmp/save.wav'
 
 
@@ -30,12 +30,13 @@ def run_output(cmd):
     return output
 
 
-def record_analyse():
+def record_analyse() -> list:
     """
     Record and feed to intent recognition.
     :return:
     """
     print('Recording voice')
+    SUBMIT_JOB.submit(playsound, 'sounds/start.wav')
     time.sleep(0.5)
     # record = run('timeout 5 arecord -q -r 16000 -c 1 -f S16_LE -t wav /tmp/abc.wav')
     # voice2json = run('/usr/bin/voice2json transcribe-wav < /tmp/abc.wav | voice2json recognize-intent')
@@ -43,8 +44,11 @@ def record_analyse():
         '/usr/bin/arecord -q -r 16000 -c 1 -f S16_LE -t raw | /usr/bin/voice2json transcribe-stream -c 1 '
         '-a - --wav-sink {wav_file} | /usr/bin/voice2json recognize-intent '.format(wav_file=RECORD_FILE))
     # print(voice2json[1].split('\n'))
+    playsound('sounds/stop.wav')
     voice2json = json.loads(voice2json[1].split('\n')[7])
     print(f"Generated voice command: {voice2json}")
+    if voice2json['text'] == '':
+        return None, None
 
     intent = str(voice2json['intent']['name'])
     return intent, voice2json
@@ -67,7 +71,14 @@ def voice_2_intent():
     Action that will be performed. In other words, it mainitain all the skills
     :return:
     """
-    intent, voice2json = record_analyse()
+    from listening_animation import get_data
+    # start()
+    # print(f"we are found voice intent {gett()}")
+    # return
+    intent, voice2json = get_data()
+    print(f'intent is {intent}')
+    if intent is None:
+        return
     if intent == 'Terminal':
         speak('Opening terminal')
         cmd = 'gnome-terminal'
@@ -114,7 +125,8 @@ def voice_2_intent():
         SUBMIT_JOB.submit(stopwatch.main)
 
     elif intent == 'CoinFlip':
-        SUBMIT_JOB.submit(coin_flip.flip_coin)
+        import coin_flip
+        coin_flip.flip_coin()
         pass
 
     elif intent == 'RollDice':
