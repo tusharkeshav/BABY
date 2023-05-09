@@ -14,10 +14,9 @@ porcupine_default = pvporcupine.create(access_key=get_config(SECTION, 'access_ke
                                        model_path=get_config(SECTION, 'wake_word_default_model'),
                                        keywords=keyword_default)
 
-recoder = PvRecorder(device_index=-1, frame_length=porcupine_default.frame_length)
-
 
 def detect_wake_word():
+    recoder = PvRecorder(device_index=-1, frame_length=porcupine_default.frame_length)
     try:
         print('*********** Starting Recording and checking for waking word ************')
         recoder.start()
@@ -35,4 +34,4 @@ def detect_wake_word():
         recoder.delete()
 
 
-print(detect_wake_word())
+# print(detect_wake_word())
