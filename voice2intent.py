@@ -130,7 +130,8 @@ def voice_2_intent():
         pass
 
     elif intent == 'RollDice':
-        SUBMIT_JOB.submit(roll_dice.dice_roll)
+        import roll_dice
+        roll_dice.roll_dice()
 
     elif intent == 'Media':
         print('Found Media intent')

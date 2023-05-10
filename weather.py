@@ -36,8 +36,8 @@ def get_weather():
           'forecast_days=1&timezone=auto'.format(latitude=latitude, longitude=longitude)
     response = _hit_api(api)
     print(response)
-    minimum_temp = response['daily']['temperature_2m_min']
-    maximum_temp = response['daily']['temperature_2m_max']
+    minimum_temp = response['daily']['temperature_2m_min'][0]
+    maximum_temp = response['daily']['temperature_2m_max'][0]
     msg1 = 'It is going to be shiny day with'
     if response['daily']['showers_sum'] == 1:
         msg1 = 'It is going to be rainy day with'

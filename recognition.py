@@ -21,7 +21,7 @@ def recognize(file, filter_keywords):
     try:
         print('recognizing data')
         query = str(r.recognize_google(audio)).lower()
-        query = str('search song on YouTube Naino wale Ne Cheda Man Ka Pyala').lower()
+        # query = str('search song on YouTube Naino wale Ne Cheda Man Ka Pyala').lower()
         if filter_keywords:
             for word in keyword_delete:
                 query = query.replace(word, '')
