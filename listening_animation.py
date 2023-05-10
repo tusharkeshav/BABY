@@ -93,11 +93,15 @@ class MainWindow(QWidget):
         # QApplication.quit()
         global intent
         intent = result
-        if intent[1]['intent'] != '':
-            font = QtGui.QFont()
-            font.setPointSize(20)
-            self.result_label.setFont(font)
-            self.result_label.setText('Intent: {found_intent}'.format(found_intent=intent[1]['text']))
+        # TODO: Below code was added to display intent on the screen but its going to write intent in same animation
+        #  window, which causing the listening animation to dis-orient when the result_label is displayed.
+        #  In future, to display it create another window that will display intent
+
+        # if intent[1]['intent'] != '':
+        #     font = QtGui.QFont()
+        #     font.setPointSize(20)
+        #     self.result_label.setFont(font)
+        #     self.result_label.setText('Intent: {found_intent}'.format(found_intent=intent[1]['text']))
         QTimer.singleShot(5000, self.stop_loader)
         # print(self.stop_loader(intent))
         print("I'm in get function")
