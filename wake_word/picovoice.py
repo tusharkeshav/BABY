@@ -1,6 +1,7 @@
 import pvporcupine
 from pvrecorder import PvRecorder
-from get_config import get_config
+from config.get_config import get_config
+from logs.Logging import log
 
 SECTION = 'picovoice'
 
@@ -19,11 +20,12 @@ def detect_wake_word():
     recoder = PvRecorder(device_index=-1, frame_length=porcupine_default.frame_length)
     try:
         print('*********** Starting Recording and checking for waking word ************')
+        log.debug('*********** Starting Recording and checking for waking word ************')
         recoder.start()
         while True:
             recorded_frame = recoder.read()
             if any([porcupine_custom.process(recorded_frame) >= 0, porcupine_default.process(recorded_frame) >= 0]):
-                print('word detected')
+                log.debug('word detected')
                 return True
 
     except KeyboardInterrupt:

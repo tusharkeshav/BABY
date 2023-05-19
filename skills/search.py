@@ -1,6 +1,6 @@
 import urllib.request
 from bs4 import BeautifulSoup
-from text2speech import speak
+from speech.text2speech import speak
 import wikipedia
 from PyQt5.QtCore import QRect, QPropertyAnimation, QEasingCurve, Qt, QThread, pyqtSignal, QTimer, QEvent
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QScrollArea, QDesktopWidget

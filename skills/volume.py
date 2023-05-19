@@ -1,5 +1,6 @@
 import subprocess
 import time
+from logs.Logging import log
 
 MUTE = 0
 LOWER = 20
@@ -8,7 +9,7 @@ temp = 20
 
 
 def _set_volume(volume):
-    print("volunw is: " + volume)
+    log.debug("volunw is: " + str(volume))
     subprocess.getoutput('amixer set Master {volume}'.format(volume=volume))
 
 

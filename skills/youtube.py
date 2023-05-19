@@ -1,8 +1,8 @@
 import webbrowser
 
-from recognition import recognize
-from text2speech import speak
-from internet import check_internet
+from utilities.recognition import recognize
+from speech.text2speech import speak
+from utilities.internet import check_internet
 
 
 def search_song(file):

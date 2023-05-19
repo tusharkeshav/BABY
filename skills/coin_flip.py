@@ -5,27 +5,26 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize, QTimer
 from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QDesktopWidget
-from voice2intent import playsound
+from playsound import playsound
 from voice2intent import SUBMIT_JOB
 
-from text2speech import speak
+from speech.text2speech import speak
 
 data = None
 
 IMAGE = {
-    1: 'img/dice/1.gif',
-    2: 'img/dice/2.gif',
-    3: 'img/dice/3.gif',
-    4: 'img/dice/4.gif',
-    5: 'img/dice/5.gif',
-    6: 'img/dice/6.gif'
+    'heads': 'img/heads.gif',
+    'tails': 'img/tails.gif'
 }
 
 
-def roll_dice():
-    result = random.randint(1, 6)
+def flip_coin():
+    result = random.choice(["Heads", "Tails"])
     # speak("It is {state}".format(state=result))
-    start(outcome=result, file=IMAGE[result], title=str(result))
+    if result == 'Heads':
+        start(outcome=result, file=IMAGE['heads'], title="Heads")
+    else:
+        start(outcome=result, file=IMAGE['tails'], title="Tails")
 
 
 class Worker(QThread):
@@ -37,8 +36,7 @@ class Worker(QThread):
     def run(self):
         # Simulate a long-running task
         # time.sleep(2)
-        # playsound('sounds/dice/dice.mp3')
-        playsound('sounds/dice/dice_roll.mp3')
+        playsound('sounds/coin_flip.mp3')
         self.finished.emit()
 
 
@@ -115,5 +113,3 @@ def start(outcome, file, title):
     window = MainWindow(file, title)
     window.show()
     app.exec_()
-
-# roll_dice()

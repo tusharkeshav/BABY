@@ -1,19 +1,12 @@
 import json
 import subprocess
-# from log import log
+from logs.Logging import log
 import time
 from concurrent.futures import ThreadPoolExecutor
 from playsound import playsound
 
-import change_brightness
-import date_time
-import media
-import random_number
-import stopwatch
-import timer
-import volume
-import weather
-from text2speech import speak
+from skills import change_brightness, media, volume, date_time, random_number, weather, stopwatch, timer
+from speech.text2speech import speak
 
 SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
 RECORD_FILE = '/tmp/save.wav'
@@ -34,7 +27,7 @@ def record_analyse() -> list:
     Record and feed to intent recognition.
     :return:
     """
-    print('Recording voice')
+    log.info('Recording voice')
     SUBMIT_JOB.submit(playsound, 'sounds/start.wav')
     time.sleep(0.5)
     # record = run('timeout 5 arecord -q -r 16000 -c 1 -f S16_LE -t wav /tmp/abc.wav')
@@ -42,10 +35,10 @@ def record_analyse() -> list:
     voice2json = run_output(
         '/usr/bin/arecord -q -r 16000 -c 1 -f S16_LE -t raw | /usr/bin/voice2json transcribe-stream -c 1 '
         '-a - --wav-sink {wav_file} | /usr/bin/voice2json recognize-intent '.format(wav_file=RECORD_FILE))
-    # print(voice2json[1].split('\n'))
+    # log.info(voice2json[1].split('\n'))
     playsound('sounds/stop.wav')
     voice2json = json.loads(voice2json[1].split('\n')[7])
-    print(f"Generated voice command: {voice2json}")
+    log.info(f"Generated voice command: {voice2json}")
     if voice2json['text'] == '':
         return None, None
 
@@ -60,7 +53,7 @@ def indentify_intent(force=True):
     :param force:
     :return: intent
     """
-    import recognition
+    import utilities.recognition as recognition
     query = recognition.recognize(RECORD_FILE, filter_keywords=False)
     intent = run_output(f'/usr/bin/voice2json recognize-intent --text-input {query}')
 
@@ -70,12 +63,12 @@ def voice_2_intent():
     Action that will be performed. In other words, it mainitain all the skills
     :return:
     """
-    from listening_animation import get_data
+    from utilities.listening_animation import get_data
     # start()
-    # print(f"we are found voice intent {gett()}")
+    # log.info(f"we are found voice intent {gett()}")
     # return
     intent, voice2json = get_data()
-    print(f'intent is {intent}')
+    log.info(f'intent is {intent}')
     if intent is None:
         return
     if intent == 'Terminal':
@@ -84,7 +77,7 @@ def voice_2_intent():
         run(cmd)
 
     elif intent == 'Brightness':
-        print(voice2json['slots'])
+        log.info(voice2json['slots'])
         if 'increase' in voice2json['slots']['action']:  # increase
             speak('Increasing Brightness')
             SUBMIT_JOB.submit(change_brightness.increase_brightness)
@@ -93,9 +86,9 @@ def voice_2_intent():
         elif 'brightness' in voice2json['slots']['action']:  # set
             value = str(voice2json['slots'].get('brightness', 0))
             speak('Changing bright Brightness to {value}'.format(value=value))
-            print('Changing bright Brightness to {value}'.format(value=value))
+            log.info('Changing bright Brightness to {value}'.format(value=value))
             curr_brightness = change_brightness.get_brightness()
-            print('value is {}'.format(value))
+            log.info('value is {}'.format(value))
             if int(curr_brightness) > int(value):
                 speak('Increasing brightness to {value}'.format(value=value))
             else:
@@ -124,20 +117,20 @@ def voice_2_intent():
         SUBMIT_JOB.submit(stopwatch.main)
 
     elif intent == 'CoinFlip':
-        import coin_flip
+        from skills import coin_flip
         coin_flip.flip_coin()
         pass
 
     elif intent == 'RollDice':
-        import roll_dice
+        from skills import roll_dice
         roll_dice.roll_dice()
 
     elif intent == 'Media':
-        print('Found Media intent')
+        log.info('Found Media intent')
         value = str(voice2json['slots'].get('status', 0))
-        print(value)
+        log.info(value)
         if value in ('resume', 'pause', 'stop', 'play'):
-            print("value is {}".format(value))
+            log.info("Media intent value is {}".format(value))
             SUBMIT_JOB.submit(media.pause_resume_toggle)
         elif value == 'mute':
             SUBMIT_JOB.submit(media.mute)
@@ -156,9 +149,9 @@ def voice_2_intent():
         elif 'sound' in voice2json['slots']:  # set
             value = str(voice2json['slots'].get('sound', 0))
             speak('Changing sound to {value}'.format(value=value))
-            print('Changing sound to {value}'.format(value=value))
+            log.info('Changing sound to {value}'.format(value=value))
             curr_sound = volume.get_volume()
-            print('value is {}'.format(value))
+            log.info('Volume intent value is {}'.format(value))
             if int(curr_sound) > int(value):
                 speak('Increasing sound to {value}'.format(value=value))
             else:
@@ -166,11 +159,11 @@ def voice_2_intent():
             SUBMIT_JOB.submit(volume.change_volume, value)
         pass
     elif intent == 'Bluetooth':
-        import bluetooth_toggle
+        from skills import bluetooth_toggle
         if 'on' in voice2json['slots']['action']:
             SUBMIT_JOB.submit(bluetooth_toggle.bluetooth_ON)
         elif 'off' in voice2json['slots']['action']:
-            print('Turning off bluetooth')
+            log.info('Turning off bluetooth')
             SUBMIT_JOB.submit(bluetooth_toggle.bluetooth_OFF)
 
     elif intent == 'SearchSong':
@@ -178,12 +171,12 @@ def voice_2_intent():
             import youtube
             SUBMIT_JOB.submit(youtube.search_song, RECORD_FILE)
         elif 'spotify' in voice2json['slots']['app']:
-            import spotify
+            from skills import spotify
             SUBMIT_JOB.submit(spotify.search_song, RECORD_FILE)
             speak('Searching Spotify for you.')
 
     elif intent == 'SearchSpotify':
-        import spotify
+        from skills import spotify
         SUBMIT_JOB.submit(spotify.search_song, RECORD_FILE)
 
     else:

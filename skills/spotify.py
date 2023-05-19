@@ -1,9 +1,11 @@
 import json
 import spotipy
 import webbrowser
-import recognition
-from text2speech import speak
+import utilities.recognition as recognition
+from speech.text2speech import speak
 import configparser as cp
+
+from logs.Logging import log
 
 config = cp.ConfigParser()
 config.optionxform = str
@@ -55,7 +57,7 @@ def _launch_spotify(search_song):
     song_items = songs_dict['items']
     song = song_items[0]['external_urls']['spotify']
     webbrowser.open(song)
-    print('Song has opened in your browser.')
+    log.debug('Song has opened in your browser.')
 
 
 def search_song(file):

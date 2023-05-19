@@ -1,12 +1,11 @@
 import sys
 import random
-import time
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize, QTimer
 from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QDesktopWidget
-from playsound import playsound
+from voice2intent import playsound
 from voice2intent import SUBMIT_JOB
 
 from text2speech import speak
@@ -14,18 +13,19 @@ from text2speech import speak
 data = None
 
 IMAGE = {
-    'heads': 'img/heads.gif',
-    'tails': 'img/tails.gif'
+    1: 'img/dice/1.gif',
+    2: 'img/dice/2.gif',
+    3: 'img/dice/3.gif',
+    4: 'img/dice/4.gif',
+    5: 'img/dice/5.gif',
+    6: 'img/dice/6.gif'
 }
 
 
-def flip_coin():
-    result = random.choice(["Heads", "Tails"])
+def roll_dice():
+    result = random.randint(1, 6)
     # speak("It is {state}".format(state=result))
-    if result == 'Heads':
-        start(outcome=result, file=IMAGE['heads'], title="Heads")
-    else:
-        start(outcome=result, file=IMAGE['tails'], title="Tails")
+    start(outcome=result, file=IMAGE[result], title=str(result))
 
 
 class Worker(QThread):
@@ -36,8 +36,7 @@ class Worker(QThread):
 
     def run(self):
         # Simulate a long-running task
-        # time.sleep(2)
-        playsound('sounds/coin_flip.mp3')
+        playsound('sounds/dice/dice_roll.mp3')
         self.finished.emit()
 
 
@@ -53,11 +52,8 @@ class MainWindow(QWidget):
         self.loader_label.setMovie(self.movie)
         screen_size = QDesktopWidget().screenGeometry()
         width, height = screen_size.width(), screen_size.height()
-        # print(f'with is {width}')
-        # print(f'height is {height}')
         self.setGeometry(0, 0, 150, 150)
         self.move(width // 2 - 100, height // 2 - 200)  # this control where is the coordinate of the window
-        # self.center_on_screen()
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.setAttribute(Qt.WA_NoSystemBackground, True)
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -74,7 +70,6 @@ class MainWindow(QWidget):
         # Set the window title and size
         self.setWindowTitle(title)
         # self.resize(self.movie.scaledSize())
-        # get_intent(self.worker)
 
     def start_function(self):
         # Disable the button and start the loader
@@ -96,9 +91,6 @@ class MainWindow(QWidget):
         QApplication.quit()
 
     def get_intent(self):
-        # # QApplication.quit()
-        # global data
-        # data = result
         font = QtGui.QFont()
         font.setPointSize(20)
         self.result_label.setFont(font)
@@ -114,3 +106,5 @@ def start(outcome, file, title):
     window = MainWindow(file, title)
     window.show()
     app.exec_()
+
+# roll_dice()

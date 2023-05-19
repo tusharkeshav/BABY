@@ -1,6 +1,6 @@
 import screen_brightness_control as sbc
-import text2speech
-
+from speech.text2speech import speak
+from logs.Logging import log
 FACTOR = 20
 
 
@@ -8,17 +8,19 @@ def set_brightness(value):
     try:
         sbc.set_brightness(value, display=0)
     except Exception as e:
-        print('Exception occured while setting brigthness. Exception: {}'.format(e))
+        log.error('Exception occured while setting brigthness. Exception: {}'.format(e))
     finally:
-        text2speech.speak('Brightness is set to {}%'.format(value))
+        log.debug('Brightness is set to {}%'.format(value))
+        speak('Brightness is set to {}%'.format(value))
 
 
 def get_brightness():
-    '''
+    """
     :return: Only return display of primary monitor/display
-    '''
+    """
     value = sbc.get_brightness()
-    text2speech.speak('Current Brightness is {}%'.format(value[0]))
+    log.debug('Current Brightness is {}%'.format(value[0]))
+    speak('Current Brightness is {}%'.format(value[0]))
     return value[0]
 
 

@@ -1,5 +1,5 @@
 import random
-from text2speech import speak
+from speech.text2speech import speak
 
 
 def get_random_number():

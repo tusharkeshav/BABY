@@ -1,4 +1,5 @@
 from voice2intent import *
+from logs.Logging import log
 
 
 def run(cmd) -> list:
@@ -9,6 +10,7 @@ def run(cmd) -> list:
 def bluetooth_OFF():
     cmd = 'rfkill block bluetooth'
     status = run(cmd=cmd)[0]
+    log.debug('Bluetooth off command submitted.')
     if int(status) == 0:
         speak('Bluetooth is set to turn off')
     else:
@@ -19,6 +21,7 @@ def bluetooth_OFF():
 def bluetooth_ON():
     cmd = 'rfkill unblock bluetooth'
     status = run(cmd=cmd)[0]
+    log.debug('Bluetooth ON command submitted.')
     if int(status) == 0:
         speak('Bluetooth is turned On')
     else:

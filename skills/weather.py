@@ -1,6 +1,6 @@
 import requests
-from text2speech import speak
-
+from speech.text2speech import speak
+from logs.Logging import log
 
 def _hit_api(api):
     try:
@@ -10,7 +10,7 @@ def _hit_api(api):
         else:
             speak('Some issue while finding weather result.')
     except Exception as e:
-        print('Issue occurred while executing {api}. Exception occurred: {e}'.format(api=api, e=e))
+        log.error('Issue occurred while executing {api}. Exception occurred: {e}'.format(api=api, e=e))
 
 
 def _check_ip():
@@ -65,7 +65,3 @@ def get_rain_snow():
         speak('It is sunny day')
 
     speak(msg1 + msg2)
-
-
-# print(get_weather())
-# print(get_rain_snow())

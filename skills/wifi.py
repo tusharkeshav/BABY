@@ -45,7 +45,6 @@ def wifi_STATUS():
             stat = 'OFF'
         speak('Wifi is turned {stat}'.format(stat=stat))
     except Exception as e:
+        log.error('Exception occurred while checking wifi status. Exception: {e}'.format(e=e))
         print('Exception occurred while checking wifi status')
         speak('Some issue occurred while checking wifi status')
-
-wifi_ON()

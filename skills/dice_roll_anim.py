@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QDesktop
 from voice2intent import playsound
 from voice2intent import SUBMIT_JOB
 
-from text2speech import speak
+from speech.text2speech import speak
 
 data = None
 
