@@ -26,14 +26,11 @@ def detect_wake_word():
             recorded_frame = recoder.read()
             if any([porcupine_custom.process(recorded_frame) >= 0, porcupine_default.process(recorded_frame) >= 0]):
                 log.debug('word detected')
+                recoder.stop()
                 return True
 
     except KeyboardInterrupt:
         recoder.stop()
     finally:
-        porcupine_custom.delete()
-        porcupine_default.delete()
         recoder.delete()
 
-
-# print(detect_wake_word())
