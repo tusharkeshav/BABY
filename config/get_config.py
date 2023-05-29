@@ -1,8 +1,10 @@
 import configparser as cp
-
+import os
 config = cp.ConfigParser()
 config.optionxform = str
-config.read('config.ini')
+
+file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../config.ini')
+config.read(file_path)
 
 
 class ConfigValueNotFound:

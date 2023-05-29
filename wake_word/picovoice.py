@@ -1,8 +1,11 @@
+import os
+
 import pvporcupine
 from pvrecorder import PvRecorder
 from config.get_config import get_config
 from logs.Logging import log
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 SECTION = 'picovoice'
 
 keyword_custom = ['hey baby']
