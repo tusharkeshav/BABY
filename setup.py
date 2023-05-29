@@ -52,8 +52,7 @@ def get_files_recursively() -> list:
 def get_root_data_files() -> list:
     data = [
         ('bin/', ['baby']),
-        (
-        'lib/baby/', ['config.ini', 'requirements.txt', 'sentences.ini', 'voice2intent.py', 'README.md', '__main__.py'])
+        ('lib/baby/', ['config.ini', 'requirements.txt', 'sentences.ini', 'voice2intent.py', 'README.md', '__main__.py'])
     ]
     return data
 

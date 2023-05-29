@@ -2,4 +2,5 @@
 - check weather
 - check time
 - check date
--
+- Since, most laptops have key to change the brightness.
+   May be we can map the keys for the brightness. as its is getting difficult to detect or change via code

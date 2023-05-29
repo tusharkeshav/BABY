@@ -105,7 +105,7 @@ class MainWindow(QWidget):
         #     self.result_label.setText('Intent: {found_intent}'.format(found_intent=intent[1]['text']))
         QTimer.singleShot(5000, self.stop_loader)
         # print(self.stop_loader(intent))
-        print("I'm in get function")
+        # print("I'm in get function")
         # return intent
 
 

@@ -16,9 +16,9 @@ def _set_volume(volume):
 def get_volume():
     """
     :param
-    :return: value: e.g: 19%
+    :return: value: e.g: 19
     """
-    volume = str(subprocess.getoutput("amixer sget Master | grep -oP '\[\K[^%]+' | head  -1")) + '%'
+    volume = str(subprocess.getoutput("amixer sget Master | grep -oP '\[\K[^%]+' | head  -1"))
     return volume
 
 
@@ -53,7 +53,7 @@ def low_then_normal():
     it will decrease volume to 20% and again increase volume to normal/original value
     :return:
     """
-    original_volume = get_volume()
+    original_volume = str(get_volume()) + '%'
     time.sleep(1)
     raise_volume_to_normal(original_volume)
 

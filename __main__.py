@@ -1,5 +1,6 @@
 from voice2intent import voice_2_intent
-from wake_word.picovoice import detect_wake_word, porcupine_default, porcupine_custom
+from wake_word.wake_word import detect_wake_word
+from logs.Logging import log
 
 if __name__ == '__main__':
     # keyboard = Controller()
@@ -10,5 +11,4 @@ if __name__ == '__main__':
             voice_2_intent()
     except Exception as e:
         print(f'Exception occurred. Exception: {e}')
-        porcupine_default.delete()
-        porcupine_custom.delete()
+        log.exception(f'Exception occurred in program. Full exception: {e}')

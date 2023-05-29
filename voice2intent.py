@@ -66,9 +66,7 @@ def voice_2_intent():
     :return:
     """
     from utilities.listening_animation import get_data
-    # start()
-    # log.info(f"we are found voice intent {gett()}")
-    # return
+
     intent, voice2json = get_data()
     log.info(f'intent is {intent}')
     if intent is None:
@@ -80,12 +78,13 @@ def voice_2_intent():
 
     elif intent == 'Brightness':
         log.info(voice2json['slots'])
-        if 'increase' in voice2json['slots']['action']:  # increase
-            speak('Increasing Brightness')
-            SUBMIT_JOB.submit(change_brightness.increase_brightness)
-        elif 'decrease' in voice2json['slots']['action']:  # decrease
-            SUBMIT_JOB.submit(change_brightness.decrease_brightness)
-        elif 'brightness' in voice2json['slots']['action']:  # set
+        if 'action' in voice2json['slots']:  # increase
+            if 'increase' in voice2json['slots']['action']:
+                speak('Increasing Brightness')
+                SUBMIT_JOB.submit(change_brightness.increase_brightness)
+            elif 'decrease' in voice2json['slots']['action']:  # decrease
+                SUBMIT_JOB.submit(change_brightness.decrease_brightness)
+        elif 'brightness' in voice2json['slots']:  # set
             value = str(voice2json['slots'].get('brightness', 0))
             speak('Changing bright Brightness to {value}'.format(value=value))
             log.info('Changing bright Brightness to {value}'.format(value=value))
@@ -150,7 +149,7 @@ def voice_2_intent():
                 SUBMIT_JOB.submit(volume.decrease_volume())
         elif 'sound' in voice2json['slots']:  # set
             value = str(voice2json['slots'].get('sound', 0))
-            speak('Changing sound to {value}'.format(value=value))
+            # speak('Changing sound to {value}'.format(value=value))
             log.info('Changing sound to {value}'.format(value=value))
             curr_sound = volume.get_volume()
             log.info('Volume intent value is {}'.format(value))
