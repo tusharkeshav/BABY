@@ -1,5 +1,5 @@
 import sys
-import time
+import os
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize, QTimer
@@ -7,6 +7,7 @@ from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QDesktopWidget
 
 intent = None
+os.chdir(os.path.dirname(os.path.abspath(__file__)) + '/../')
 
 
 def get_data():

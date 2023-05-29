@@ -1,15 +1,17 @@
 import json
 import subprocess
+import os
 from logs.Logging import log
 import time
 from concurrent.futures import ThreadPoolExecutor
-from playsound import playsound
+from sounds.play import playsound
 
 from skills import change_brightness, media, volume, date_time, random_number, weather, stopwatch, timer
 from speech.text2speech import speak
 
 SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
 RECORD_FILE = '/tmp/save.wav'
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 def run(cmd):

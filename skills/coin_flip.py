@@ -1,3 +1,4 @@
+import os
 import sys
 import random
 
@@ -5,12 +6,13 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize, QTimer
 from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QDesktopWidget
-from playsound import playsound
+from sounds.play import playsound
 from voice2intent import SUBMIT_JOB
 
 from speech.text2speech import speak
 
 data = None
+os.chdir(os.path.dirname(os.path.abspath(__file__)) + '/../')
 
 IMAGE = {
     'heads': 'img/heads.gif',

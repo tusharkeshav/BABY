@@ -32,10 +32,10 @@ def pause_resume_toggle():
 
 
 def resume_media():
-    '''
+    """
         Not working, as we are unable to figure out, how to identify if any media is running or not
         :return:
-    '''
+    """
     if _detect_sound() == False:
         pause_resume_toggle()
     else:
