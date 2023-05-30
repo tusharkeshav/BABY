@@ -1,7 +1,9 @@
 import json
+import time
+
 import spotipy
 import webbrowser
-import utilities.recognition as recognition
+import utilities.recognition as recognition, utilities.record as record
 from speech.text2speech import speak
 import configparser as cp
 
@@ -62,6 +64,14 @@ def _launch_spotify(search_song):
 
 def search_song(file):
     song = recognition.recognize(file, filter_keywords=True)
+    if song is '':
+        log.debug('Recognizer didn\'t give song result.')
+        speak('What song you would like to listen?')
+        time.sleep(0.5)
+        song = record.record_and_analyse()
+        if song.replace(' ', '') == '':
+            log.debug('Song was not identified by recognizer. Returning simply.')
+            return
     _launch_spotify(song)
     speak('Here is your searched song')
     pass

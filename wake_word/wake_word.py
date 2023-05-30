@@ -1,6 +1,5 @@
 from config.get_config import get_config
 from logs.Logging import log
-from wake_word.picovoice import porcupine_default, porcupine_custom
 
 SECTION = 'wakeWord'
 
@@ -23,14 +22,12 @@ def detect_wake_word():
     method = get_wake_word_config()
     log.debug(f'Using method={method} to detect wake word')
     if method == 'mycroft':
-        import mycroft
+        from wake_word import mycroft
         mycroft.detect_wake_word()
         return
     elif method == 'picovoice':
-        import picovoice
+        from wake_word import picovoice
         picovoice.detect_wake_word()
-        porcupine_default.delete()
-        porcupine_custom.delete()
         return
     else:
         raise WakeWorkConfigurationError()
