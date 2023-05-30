@@ -169,7 +169,7 @@ def voice_2_intent():
 
     elif intent == 'SearchSong':
         if 'youtube' in voice2json['slots']['app']:
-            import youtube
+            from skills import youtube
             SUBMIT_JOB.submit(youtube.search_song, RECORD_FILE)
         elif 'spotify' in voice2json['slots']['app']:
             from skills import spotify
