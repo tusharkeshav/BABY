@@ -49,14 +49,11 @@ class MainWindow(QWidget):
         self.loader_label.setMovie(self.movie)
         screen_size = QDesktopWidget().screenGeometry()
         width, height = screen_size.width(), screen_size.height()
-        # print(f'with is {width}')
-        # print(f'height is {height}')
         # self.setGeometry(0, 0, 150, 150)
         self.move(width // 2 - 100, height - 200)  # this control where is the coordinate of the window
-        # self.center_on_screen()
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.setAttribute(Qt.WA_NoSystemBackground, True)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
 
         # Create a label to display the result of the function
         self.result_label = QLabel('')

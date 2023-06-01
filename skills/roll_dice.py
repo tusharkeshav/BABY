@@ -58,7 +58,7 @@ class MainWindow(QWidget):
         self.move(width // 2 - 100, height // 2 - 200)  # this control where is the coordinate of the window
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.setAttribute(Qt.WA_NoSystemBackground, True)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
 
         # Create a label to display the result of the function
         self.result_label = QLabel('')
