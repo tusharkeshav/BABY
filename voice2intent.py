@@ -67,7 +67,7 @@ def voice_2_intent():
     """
     from utilities.listening_animation import get_data
 
-    intent, voice2json = get_data()
+    intent, voice2json = get_data(calling_func='voice2intent')
     log.info(f'intent is {intent}')
     if intent is None:
         return
@@ -168,12 +168,16 @@ def voice_2_intent():
             SUBMIT_JOB.submit(bluetooth_toggle.bluetooth_OFF)
 
     elif intent == 'SearchSong':
+        # NOTE: We wont submit the function in threadpool. Since, we are using animationa and PYQT dont support
+        # runnning expect main thread. So submitting job in main function only.
         if 'youtube' in voice2json['slots']['app']:
             from skills import youtube
-            SUBMIT_JOB.submit(youtube.search_song, RECORD_FILE)
+            youtube.search_song(RECORD_FILE)
+            # SUBMIT_JOB.submit(youtube.search_song, RECORD_FILE)
         elif 'spotify' in voice2json['slots']['app']:
             from skills import spotify
-            SUBMIT_JOB.submit(spotify.search_song, RECORD_FILE)
+            spotify.search_song(RECORD_FILE)
+            # SUBMIT_JOB.submit(spotify.search_song, RECORD_FILE)
             speak('Searching Spotify for you.')
 
     elif intent == 'SearchSpotify':

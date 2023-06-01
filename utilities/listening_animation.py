@@ -1,7 +1,6 @@
 import sys
 import os
 
-from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize, QTimer
 from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QDesktopWidget
@@ -9,8 +8,14 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QDesktop
 intent = None
 os.chdir(os.path.dirname(os.path.abspath(__file__)) + '/../')
 
+# This is used to identify which function is calling listening animation. Its case where we need
+# listening animation in case lets say for YouTube skill or spotify skill
+func = ''
 
-def get_data():
+
+def get_data(calling_func):
+    global func
+    func = calling_func
     start()
     return intent
 
@@ -23,10 +28,13 @@ class Worker(QThread):
 
     def run(self):
         # Simulate a long-running task
-        from voice2intent import record_analyse
-        result = record_analyse()
-        # time.sleep(5)
-        # result = (1, "hello")
+        if func == 'voice2intent':
+            from voice2intent import record_analyse
+            result = record_analyse()
+        elif func in ('youtube', 'spotify'):
+            from utilities import record
+            result = (record.record_and_analyse(),
+                      None)  # since we are using tuple as return type so converting the result to tuple
         self.finished.emit(result)
 
 

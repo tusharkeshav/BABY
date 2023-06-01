@@ -4,7 +4,7 @@ import webbrowser
 from utilities.recognition import recognize
 from speech.text2speech import speak
 from utilities.internet import check_internet
-from utilities.record import record_and_analyse
+from utilities import listening_animation
 from logs.Logging import log
 
 
@@ -17,9 +17,9 @@ def search_song(file):
         if song.replace(' ', '') == '':  # removing spaces
             log.debug('Recognizer didn\'t give song result.')
             speak('What song you would like to search for?')
-            time.sleep(0.4)
-            song = record_and_analyse()
-            if song == '':
+            time.sleep(0.2)
+            song = listening_animation.get_data(calling_func='youtube')[0]
+            if song.replace(' ', '') == '':
                 log.debug('Song was identified by recognizer. Returning simply.')
                 return
 

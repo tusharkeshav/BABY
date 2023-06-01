@@ -3,7 +3,7 @@ import time
 
 import spotipy
 import webbrowser
-import utilities.recognition as recognition, utilities.record as record
+import utilities.recognition as recognition, utilities.listening_animation as listening_animation
 from speech.text2speech import speak
 import configparser as cp
 
@@ -67,8 +67,8 @@ def search_song(file):
     if song is '':
         log.debug('Recognizer didn\'t give song result.')
         speak('What song you would like to listen?')
-        time.sleep(0.5)
-        song = record.record_and_analyse()
+        time.sleep(0.2)
+        song = listening_animation.get_data(calling_func='spotify')[0]
         if song.replace(' ', '') == '':
             log.debug('Song was not identified by recognizer. Returning simply.')
             return
