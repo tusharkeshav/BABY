@@ -34,9 +34,7 @@ def bluetooth_STATUS():
     output = run(cmd=cmd)[1]
     check_device = output.split('\n')
     if len(check_device) < 2:
-        print('Bluetooth is turned off')
         speak('Blue tooth is OFF')
     else:
-        print('Bluetooth is turned on')
         speak('Bluetooth is ON')
-    pass
+    log.debug('Bluetooth status is: {output}'.format(output=output))
