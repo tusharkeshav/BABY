@@ -31,7 +31,7 @@ class Worker(QThread):
         if func == 'voice2intent':
             from voice2intent import record_analyse
             result = record_analyse()
-        elif func in ('youtube', 'spotify'):
+        elif func in ('youtube', 'spotify', 'netflix', 'prime'):
             from utilities import record
             result = (record.record_and_analyse(),
                       None)  # since we are using tuple as return type so converting the result to tuple
