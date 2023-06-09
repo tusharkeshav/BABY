@@ -2,7 +2,7 @@ import speech_recognition as sr
 from logs.Logging import log
 
 keyword_delete = ['find', 'play', 'youtube', 'music', 'search song on', 'search song', 'search', 'song on', 'spotify'
-                  'movie', 'netflix', 'search movie']
+                  'movie', 'movie on', 'movie in', 'netflix', 'search movie']
 
 
 def recognize(file, filter_keywords):
@@ -24,7 +24,7 @@ def recognize(file, filter_keywords):
         print('*********** started recognizing data **************')
         log.debug('*********** started recognizing data **************')
         query = str(r.recognize_google(audio)).lower()
-        # query = str('search song on YouTube Naino wale Ne Cheda Man Ka Pyala').lower()
+        log.debug(f'Recognized query before filtering is: {query}')
         if filter_keywords:
             for word in keyword_delete:
                 query = query.replace(word, '')
