@@ -7,7 +7,7 @@ file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../config.
 config.read(file_path)
 
 
-class ConfigValueNotFound:
+class ConfigValueNotFound(Exception):
     pass
 
 
