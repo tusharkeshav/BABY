@@ -8,6 +8,7 @@ from speech.text2speech import speak
 import configparser as cp
 
 from logs.Logging import log
+from utilities.internet import check_internet
 
 config = cp.ConfigParser()
 config.optionxform = str
@@ -63,6 +64,9 @@ def _launch_spotify(search_song):
 
 
 def search_song(file):
+    if not check_internet():
+        speak('Looks like you are not connected to internet.')
+        return
     song = recognition.recognize(file, filter_keywords=True)
     if song is '':
         log.debug('Recognizer didn\'t give song result.')
