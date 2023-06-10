@@ -5,6 +5,18 @@ keyword_delete = ['find', 'play', 'youtube', 'music', 'search song on', 'search 
                   'movie', 'movie on', 'movie in', 'netflix', 'search movie']
 
 
+def _clean_query(query: str, filter_keywords: bool) -> str:
+
+    # Filter keywords
+    if filter_keywords:
+        for word in keyword_delete:
+            query = query.replace(word, '')
+
+    # remove trailing and leading spaces if any
+    query = ' '.join(query.split())
+    return query
+
+
 def recognize(file, filter_keywords):
     """
     Recognize the input file(audio) and convert it to text
@@ -25,9 +37,7 @@ def recognize(file, filter_keywords):
         log.debug('*********** started recognizing data **************')
         query = str(r.recognize_google(audio)).lower()
         log.debug(f'Recognized query before filtering is: {query}')
-        if filter_keywords:
-            for word in keyword_delete:
-                query = query.replace(word, '')
+        query = _clean_query(query, filter_keywords)
         log.debug(f'Recognized query after filtering is: {query}')
         return query
     except Exception as e:

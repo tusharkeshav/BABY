@@ -4,3 +4,9 @@
 - check date
 - Since, most laptops have key to change the brightness.
    May be we can map the keys for the brightness. as its is getting difficult to detect or change via code
+
+Skills:
+Public api: https://mixedanalytics.com/blog/list-actually-free-open-no-auth-needed-apis/
+- insult me ->https://evilinsult.com/generate_insult.php?lang=en&type=json
+- ask me question -> https://opentdb.com/api.php?amount=10&category=17&difficulty=easy
+- dictionary api -> https://api.dictionaryapi.dev/api/v2/entries/en/meow

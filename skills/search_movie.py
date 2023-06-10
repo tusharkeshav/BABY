@@ -1,22 +1,36 @@
 import math
 import webbrowser
 import re
+from urllib.parse import unquote
 import search_engine_parser.core.exceptions
 from search_engine_parser.core.engines.google import Search as GoogleSearch
+from search_engine_parser.core.engines.duckduckgo import Search as DuckDuckGo
 from logs.Logging import log
 from utilities import listening_animation
 from utilities.internet import check_internet
 from speech.text2speech import speak
 from utilities.recognition import recognize
 
-netflix_dork = '{movie} inurl:"netflix.com" inurl:"title"'
-prime_dork = '{movie} inurl:"primevideo.com/detail"'
+netflix_dork = '{movie} site:netflix.com'
+prime_dork = '{movie} site:primevideo.com/detail'
+
+netflix_keywords = ['offical', 'watch', 'netflix', 'site']
+prime_keywords = ['prime', 'video']
 
 
-def _get_original_link(url: str) -> str:
-    url_list = url.split('q=')
-    log.debug(f'Netflix url retrieved from google is: {url}')
-    return url_list[1]
+def _get_original_link(url: str, engine: str) -> str:
+    if engine == 'google':
+        url_list = url.split('q=')
+        log.debug(f'Netflix url retrieved from google is: {url}')
+        return url_list[1]
+    elif engine == 'duckduckgo':
+        """
+        Bug: There is a bug in duckduckgo response. it send sometime exact link to website or sometime starting with //:duckduckgo.com/blabla
+        So, we are splitting url and picking the last index.
+        """
+        url_list = url.split('uddg=')
+        log.debug(f'Duckduckgo url is {url} and split url: {url_list}')
+        return unquote(url_list[-1])
 
 
 def remove_special_characters(text: str) -> str:
@@ -24,20 +38,45 @@ def remove_special_characters(text: str) -> str:
     pattern = r'[^a-zA-Z0-9\s]'
 
     # Use the pattern to replace special characters with an empty string
-    text = re.sub(pattern, '', text)
+    text = re.sub(pattern, ' ', text)
+    text = ' '.join(text.split())
 
     return text
 
 
-def confidence(query: str, search_result_title: str):
-    title = remove_special_characters(search_result_title).lower().split(" ")
-    query = query.lower().split(" ")
+def confidence(query: str, search_result_title: str, filter_keywords: list):
+    """
+    Confidence score tell how confidence is the search result and the asked query. It find confidence between user
+    asked query and the title return by search engine. it return bool which show True as confidence and false as not confident
+
+    :formula: (Number of keyword in title(after cleaning) found in query) / (total title words) * 100
+    :param query: User asked query
+    :param search_result_title: Title of first searched result on search engine
+    :param filter_keywords: Filter some keyword from the title.
+    E.g: Netflix title is always: "Watch <movie-name> | Netflix official site". They keywords s.a netflix, watch,
+    official, site can disturb confidence score
+    :return: bool
+    """
+    title = remove_special_characters(search_result_title).lower()  # spiderman
+    query = remove_special_characters(query).lower()  # spider man
+    log.debug(f"Title: {title} and the searched query: {query}")
     confidence_count = 0
-    for chunk in query:
-        if chunk in title:
-            confidence_count += 1
-    if math.ceil(confidence_count / len(query)) * 100 >= 50:
-        return True
+    if len(title) <= len(query):
+        title = title.split()
+        for chunk in title:
+            if chunk not in filter_keywords and chunk in query:
+                confidence_count += 1
+        log.debug(f'Confidence count: {confidence_count}')
+        if math.ceil(confidence_count / len(title)) * 100 >= 50:
+            return True
+    else:
+        query = query.split()
+        for chunk in query:
+            if chunk in title:
+                confidence_count += 1
+        log.debug(f'Confidence count: {confidence_count}')
+        if math.ceil(confidence_count / len(query)) * 100 >= 50:
+            return True
     return False
 
 
@@ -59,9 +98,12 @@ def search_netflix(file: str):
             log.debug('Recognizer didn\'t give any results.')
             return
     try:
-        result = GoogleSearch().search(query=netflix_dork.format(movie=movie), page=1)
-        netflix_url = _get_original_link(result[0]['raw_urls'])
-        if confidence(movie, result[0]['titles']):
+        log.debug('Searched query on netflix: {query}'.format(query=netflix_dork.format(movie=movie)))
+        result = DuckDuckGo().search(query=netflix_dork.format(movie=movie), page=1)
+        # netflix_url = _get_original_link(result[0]['raw_urls'], engine='google')
+        log.debug(f'Result for netflex from duckduckgo {result[0]}')
+        netflix_url = _get_original_link(result[0]['links'], engine='duckduckgo')
+        if confidence(movie, result[0]['titles'], filter_keywords=netflix_keywords):
             webbrowser.open(netflix_url)
             speak('Here is your search result')
         else:
@@ -87,10 +129,15 @@ def search_prime(file: str):
             log.debug('Recognizer didn\'t give any results.')
             return
     try:
-        result = GoogleSearch().search(query=prime_dork.format(movie=movie), page=1)
-        prime_url = _get_original_link(result[0]['raw_urls'])
-        webbrowser.open(prime_url)
-        speak('Here is your search result')
+        log.debug('Searched query on prime: {query}'.format(query=netflix_dork.format(movie=movie)))
+        result = ().search(query=prime_dork.format(movie=movie), page=1)
+        # prime_url = _get_original_link(result[0]['raw_urls'], engine='google')
+        prime_url = _get_original_link(result[0]['links'], engine='duckduckgo')
+        if confidence(movie, result[0]['titles'], filter_keywords=prime_keywords):
+            webbrowser.open(prime_url)
+            speak('Here is your search result')
+        else:
+            raise search_engine_parser.core.exceptions.NoResultsFound
     except search_engine_parser.core.exceptions.NoResultsFound as e:
         speak('No search results found for movie name {query} on amazon prime'.format(query=movie))
         log.debug('No search results were found for {query} on amazon prime'.format(query=movie))
