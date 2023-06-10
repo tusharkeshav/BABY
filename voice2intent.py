@@ -6,7 +6,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from sounds.play import playsound
 
-from skills import change_brightness, media, volume, date_time, random_number, weather, stopwatch, timer
+from skills import change_brightness, media, volume, date_time, random_number, weather, stopwatch, timer, phone
 from speech.text2speech import speak
 
 SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
@@ -192,6 +192,14 @@ def voice_2_intent():
     elif intent == 'SearchSpotify':
         from skills import spotify
         SUBMIT_JOB.submit(spotify.search_song, RECORD_FILE)
+
+    elif intent == 'Phone':
+        if 'ring' in voice2json['slots']['action']:
+            SUBMIT_JOB.submit(phone.ring_device)
+            pass
+        elif 'ping' in voice2json['slots']['action']:
+            SUBMIT_JOB.submit(phone.ping_device)
+            pass
 
     else:
         speak('Sorry I don\'t understand this. Can you please repeat')
