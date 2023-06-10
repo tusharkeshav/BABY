@@ -29,7 +29,7 @@ def speak(text) -> None:
                                      "$t ; rm $t".format(
                                          text=text)])
         elif method.lower() == 'piper':
-            output = subprocess.run(["/bin/bash", "-c", "set -o pipefail; echo '{text}' | {path}piper --model {"
+            output = subprocess.run(["/bin/bash", "-c", "set -o pipefail; echo \"{text}\" | {path}piper --model {"
                                                         "path}models/{model} --output_raw | play -t raw -r 16000 "
                                                         "--bits 16 -e signed-integer -".format(text=text,
                                                                                                model=get_config('speech', 'piper_model'),
