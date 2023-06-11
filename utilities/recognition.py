@@ -42,3 +42,4 @@ def recognize(file, filter_keywords):
         return query
     except Exception as e:
         log.error(f"Exception while recognizing text. Exception: {e}")
+        return ''
