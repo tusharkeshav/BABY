@@ -30,13 +30,12 @@ def read_section():
         csvreader = csv.reader(csvfile, delimiter=',')
         count = 0
         global sections
-        sections = {'sections': []}
+        sections = {}
         for row in csvreader:
-            section = {'intent': '', 'action': '', 'sentences': [], 'file_path': '', 'module': '', 'file_type': ''}
+            section = {'action': '', 'sentences': [], 'file_path': '', 'module': '', 'file_type': ''}
             if count == 0:
                 count += 1
                 continue
-            section['intent'] = row[0]
             section['action'] = row[1]
             section['sentences'] = '\n'.join(row[2].split(';'))
             if '::' in row[3]:
@@ -48,7 +47,7 @@ def read_section():
                 raise FileTypeError('File extension can only be .py or .sh')
             section['file_path'] = file
             section['module'] = module
-            sections['sections'].append(section)
+            sections[row[0]] = section
     csvfile.close()
     return sections
 
@@ -72,11 +71,13 @@ def train_model():
         log.info('Model trained successfully')
 
 
-def load_custom_skill():
-    sections = read_section()
+def load_custom_skill(intent: str):
+    # sections = read_section()
     log.debug('Reading custom skills. DATA: {data}'.format(data=sections))
-    for section in sections['sections']:
-        file_path, module, file_type = section['file_path'], section['module'], section['file_type']
+
+    if intent in sections:
+        print(sections[intent]['file_path'])
+        file_path, module, file_type = sections[intent]['file_path'], sections[intent]['module'], sections[intent]['file_type']
         print(f'file path: {file_path}')
         print(f'module path: {module}')
         if file_type == '.py':
@@ -89,7 +90,9 @@ def load_custom_skill():
         elif file_type == '.sh':
             status, output = subprocess.getstatusoutput(file_path)
             log.info(f'The command {file_path} executed. Status: {status} and Output: {output}')
+    else:
+        log.error('Intent: {intent} not found'.format(intent=intent))
 
 
-
-load_custom_skill()
+read_section()
+load_custom_skill('insult')
