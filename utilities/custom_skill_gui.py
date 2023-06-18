@@ -1,8 +1,11 @@
+import os
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QTextEdit, QPushButton, QFileDialog
-from PyQt5.QtGui import QFont, QPainter
+from PyQt5.QtGui import QFont, QPainter, QIcon, QPen, QColor, QPainterPath
 from PyQt5.QtCore import Qt, QRectF
-from utilities.custom_skill import write_custom_skill, check_function_existence
+from utilities.custom_skill import write_custom_skill, check_function_existence, check_intent_exist_csv
+
+cross_icon = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'img/icons/cross.png')
 
 
 class RoundedTextEdit(QTextEdit):
@@ -25,6 +28,7 @@ class InputFormWindow(QMainWindow):
         self.setWindowTitle("Add Skill")
         self.setGeometry(100, 100, 400, 500)
         self.setStyleSheet("background-color: #e6d330;")
+        self.setWindowFlag(Qt.FramelessWindowHint)
 
         # Create the widgets
         self.heading_label = QLabel(self)
@@ -65,7 +69,7 @@ class InputFormWindow(QMainWindow):
 
         self.non_editable_field = QLabel(self)
         self.non_editable_field.setFont(QFont("Arial", 12))
-        self.non_editable_field.setGeometry(20, 230, 400, 30)
+        self.non_editable_field.setGeometry(20, 430, 360, 60)
 
         self.file_path_label = QLabel(self)
         self.file_path_label.setText("File Path:")
@@ -99,15 +103,51 @@ class InputFormWindow(QMainWindow):
         self.submit_button.setGeometry(140, 400, 120, 30)
         self.submit_button.setStyleSheet("background-color: #336699; color: #FFFFFF; border-radius: 5px;")
 
-        # self.result_label = QLabel(self)
-        # self.result_label.setFont(QFont("Arial", 12))
-        # self.result_label.setGeometry(20, 420, 360, 100)
-        # self.result_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-        # self.result_label.setWordWrap(True)
+        self.close_button = QPushButton(self)
+        self.close_button.setIcon(QIcon(cross_icon))  # Replace "cross.png" with the path to your cross image
+        self.close_button.setGeometry(370, 10, 20, 20)
+        self.close_button.setStyleSheet("background-color: transparent;")
+        self.close_button.clicked.connect(self.close)
 
         # Connect the button signals to slots
         self.browse_button.clicked.connect(self.browse_file)
         self.submit_button.clicked.connect(self.submit)
+
+        self.draggable = False
+        self.offset = None
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Create a rounded rectangle path
+        rounded_rect = QPainterPath()
+        rounded_rect.addRoundedRect(QRectF(self.rect()), 10, 10)
+
+        # Set the window shape mask to the rounded rectangle path
+        painter.setClipPath(rounded_rect)
+        painter.setRenderHint(QPainter.Antialiasing, True)
+
+        # Draw the bold black border
+        border_pen = QPen(QColor(0, 0, 0), 3)
+        painter.setPen(border_pen)
+        painter.drawRect(self.rect())
+
+        super().paintEvent(event)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.draggable = True
+            self.offset = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if self.draggable and self.offset is not None:
+            self.move(self.mapToGlobal(event.pos() - self.offset))
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.draggable = False
+            self.offset = None
 
     def update_non_editable_field(self):
         action = self.action_entry.text()
@@ -117,10 +157,10 @@ class InputFormWindow(QMainWindow):
         for sentence in sentences:
             for act in action:
                 sentences_list.append(sentence.replace('<action>', act))
-                # if '<action>' in sentence:
-                #     sentences_list.append(sentence.replace('<action>', act))
-        self.non_editable_field.setFont(QFont("Arial", 10))
-        self.non_editable_field.setText(f"Action: {action}\nSentences: {sentences_list}")
+        self.non_editable_field.setFont(QFont("Arial", 10, QFont.Bold))
+        self.non_editable_field.setStyleSheet("color: green")
+        # self.non_editable_field.setText(f"Action: {action}\nSpeak: {sentences_list}")
+        self.non_editable_field.setText(f"Sentences: {sentences_list}")
 
     def browse_file(self):
         file_dialog = QFileDialog()
@@ -130,25 +170,81 @@ class InputFormWindow(QMainWindow):
             file_path = file_dialog.selectedFiles()[0]
             self.file_path_entry.setText(file_path)
 
+    def set_error(self, error_msg: str):
+        error_tooltip = error_msg
+        self.non_editable_field.setFont(QFont("Arial", 10, QFont.Bold))
+        self.non_editable_field.setStyleSheet("color: red")
+        self.non_editable_field.setText(error_tooltip)
+
+    def check_error(self, intent, action, sentences, file_path, method):
+        """
+        :return: True-> if error exist. False -> no error
+        """
+        file_type = os.path.splitext(file_path)[1]
+        print('file exist or not: ' + str(os.path.exists(file_path)))
+        if len(intent) == 0:
+            self.set_error(error_msg="Error: Intent can't be empty")
+            return True
+        elif check_intent_exist_csv(intent=intent):
+            self.set_error(error_msg="Error: Intent already exist in skill.csv file.\n"
+                                     "Note: Please recheck skill.csv and sentence file")
+            return True
+        elif len(sentences) == 0:
+            self.set_error(error_msg="Error: Sentences can't be empty")
+            return True
+
+        elif len(file_path) == 0:
+            self.set_error(error_msg="Error: File path can't be empty")
+            return True
+
+        elif os.path.splitext(file_path)[1] not in ('.py', '.sh'):
+            """
+            if file type selected/pasted is not .py or .sh. So, not supported
+            """
+            self.set_error(error_msg=f"Error: File Type is \'{file_type}\', which is not supported.\n"
+                                     f"NOTE: Only .py or .sh file type are allowed")
+            return True
+
+        elif not os.path.exists(file_path):
+            self.set_error(error_msg=f"Error: File: \'{file_path}\' doesn't exist. Please recheck")
+            return True
+
+        elif len(method) == 0:
+            """
+            if method field is empty and filetype is also python. Then its not allowed.
+            """
+            if file_type == '.py':
+                self.set_error(error_msg="Error: Method can't be empty for python file.\n"
+                                         "NOTE: If file path is python file. Then method can't be empty.")
+                return True
+
+        elif len(method) != 0:
+            if file_type == '.py' and not check_function_existence(file_path, method.replace('(', '').replace(')', '')):
+                self.set_error(error_msg=f"Error: Method '{method}' doesn't exist in file path."
+                                         "\nNote: For python file, method should exist.")
+                return True
+
+        return False
+
     def submit(self):
         intent = self.intent_entry.text()
         action = self.action_entry.text()
         sentences = self.sentences_text.toPlainText()
         file_path = self.file_path_entry.text()
         method = self.method_entry.text()
-
-        # Display the entered data
-        result_text = f"<b>Intent:</b> {intent}<br><b>Action:</b> {action}<br><b>Sentences:</b><br>{sentences}<br><b>File Path:</b> {file_path}"
-        write_custom_skill(intent, action, sentences, file_path)
-        # self.result_label.setText(result_text)
-        QApplication.quit()
+        print("sentences are" + str(sentences))
+        if self.check_error(intent, action, sentences, file_path, method):
+            pass
+        elif len(method) == 0:
+            write_custom_skill(intent, action, sentences, file_path)
+            QApplication.quit()
+        else:
+            write_custom_skill(intent, action, sentences, file_path + '::' + method.replace('(', '').replace(')', ''))
+            QApplication.quit()
 
 
 def add_skill():
     app = QApplication(sys.argv)
     window = InputFormWindow()
     window.show()
-    sys.exit(app.exec_())
-
-
-add_skill()
+    app.exec_()

@@ -1,0 +1,2 @@
+intent,action,sentence,file_path
+insult,insult | embarrass,please <action> me;can you <action> me,/home/akhil/insult_home.py::insult

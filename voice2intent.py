@@ -8,6 +8,8 @@ from sounds.play import playsound
 
 from skills import change_brightness, media, volume, date_time, random_number, weather, stopwatch, timer, phone
 from speech.text2speech import speak
+from utilities.custom_skill import load_custom_skill, check_intent_exist_csv
+from utilities.custom_skill_gui import add_skill
 
 SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
 RECORD_FILE = '/tmp/save.wav'
@@ -200,6 +202,12 @@ def voice_2_intent():
         elif 'ping' in voice2json['slots']['action']:
             SUBMIT_JOB.submit(phone.ping_device)
             pass
+
+    elif intent == 'Skill':
+        add_skill()
+
+    elif check_intent_exist_csv(intent=intent):
+        SUBMIT_JOB.submit(load_custom_skill, intent)
 
     else:
         speak('Sorry I don\'t understand this. Can you please repeat')
