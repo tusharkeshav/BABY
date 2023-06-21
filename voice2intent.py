@@ -10,9 +10,13 @@ from skills import change_brightness, media, volume, date_time, random_number, w
 from speech.text2speech import speak
 from utilities.custom_skill import load_custom_skill, check_intent_exist_csv
 from utilities.custom_skill_gui import add_skill
+from config.get_config import get_config
+from utilities.train_model import train_model, detect_change
 
 SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
-RECORD_FILE = '/tmp/save.wav'
+RECORD_FILE = get_config('default', 'record_file')
+VOICE2JSON = get_config('default', 'voice2json')
+ARECORD = get_config('default', 'arecord')
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -26,6 +30,12 @@ def run_output(cmd):
     return output
 
 
+def pre_checks():
+    if detect_change():
+        log.info('Sentence file is changed. Training model again.')
+        train_model()
+
+
 def record_analyse() -> list:
     """
     Record and feed to intent recognition.
@@ -37,8 +47,8 @@ def record_analyse() -> list:
     # record = run('timeout 5 arecord -q -r 16000 -c 1 -f S16_LE -t wav /tmp/abc.wav')
     # voice2json = run('/usr/bin/voice2json transcribe-wav < /tmp/abc.wav | voice2json recognize-intent')
     voice2json = run_output(
-        '/usr/bin/arecord -q -r 16000 -c 1 -f S16_LE -t raw | /usr/bin/voice2json transcribe-stream -c 1 '
-        '-a - --wav-sink {wav_file} | /usr/bin/voice2json recognize-intent '.format(wav_file=RECORD_FILE))
+        '{arecord} -q -r 16000 -c 1 -f S16_LE -t raw | {voice2json} transcribe-stream -c 1 '
+        '-a - --wav-sink {wav_file} | /usr/bin/voice2json recognize-intent '.format(wav_file=RECORD_FILE, voice2json=VOICE2JSON, arecord=ARECORD))
     # log.info(voice2json[1].split('\n'))
     playsound('sounds/stop.wav')
     voice2json = json.loads(voice2json[1].split('\n')[7])
@@ -67,6 +77,7 @@ def voice_2_intent():
     Action that will be performed. In other words, it mainitain all the skills
     :return:
     """
+    pre_checks()
     from utilities.listening_animation import get_data
 
     intent, voice2json = get_data(calling_func='voice2intent')

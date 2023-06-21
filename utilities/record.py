@@ -1,12 +1,14 @@
 import subprocess
 import utilities.recognition as recognition
+from config.get_config import get_config
 
 FILE = '/tmp/record.wav'
 TIMEOUT = 4  # Timeout is the duration for which you wanted to record for
+ARECORD = get_config('default', 'arecord')
 
 
 def run() -> None:
-    subprocess.getstatusoutput('/usr/bin/arecord -q -r 16000 -d {timeout} -c 1 -f S16_LE -t wav {save_path}'.format(save_path=FILE, timeout=TIMEOUT))
+    subprocess.getstatusoutput('{arecord} -q -r 16000 -d {timeout} -c 1 -f S16_LE -t wav {save_path}'.format(save_path=FILE, timeout=TIMEOUT, arecord=ARECORD))
 
 
 def record() -> None:

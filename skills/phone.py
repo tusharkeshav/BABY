@@ -4,7 +4,7 @@ from logs.Logging import log
 from speech.text2speech import speak
 from config.get_config import get_config, ConfigValueNotFound
 
-binary_path = '/usr/bin/kdeconnect-cli '
+binary_path = get_config('phone', 'kdeconnect')
 try:
     DEVICE_NAME = get_config('phone', 'id')
 except ConfigValueNotFound:

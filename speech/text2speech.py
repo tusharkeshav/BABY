@@ -4,6 +4,7 @@ from logs.Logging import log
 from config.get_config import get_config
 
 method: str = get_config('speech', 'method')  # Which method to use.
+PLAY = get_config('default', 'play')
 
 
 def speak(text) -> None:
@@ -30,11 +31,11 @@ def speak(text) -> None:
                                          text=text)])
         elif method.lower() == 'piper':
             output = subprocess.run(["/bin/bash", "-c", "set -o pipefail; echo \"{text}\" | {path}piper --model {"
-                                                        "path}models/{model} --output_raw | play -t raw -r 16000 "
+                                                        "path}models/{model} --output_raw | {play} -t raw -r 16000 "
                                                         "--bits 16 -e signed-integer -".format(text=text,
                                                                                                model=get_config('speech', 'piper_model'),
-                                                                                               path='speech/piper/')],
-                                                                                                stderr=subprocess.PIPE)
+                                                                                               path='speech/piper/', play=PLAY)],
+                                                                                                stderr=subprocess.PIPE,)
         if output.returncode != 0:
             error = output.stderr.decode('utf-8')
             raise RuntimeError('Subprocess failed to execute command')
