@@ -10,6 +10,11 @@ try:
 except ConfigValueNotFound:
     DEVICE_NAME = ''
 
+try:
+    xclip_path = get_config('default', 'xclip')
+except ConfigValueNotFound:
+    xclip_path = ''
+
 
 class NoModuleFound(Exception):
     pass
@@ -21,18 +26,18 @@ def run(cmd: str):
     pass
 
 
-def check_install() -> bool:
+def check_install(module) -> bool:
     """
     This will check if the kdeconnect-cli is there or not
     :return:
     """
-    cmd = "which " + binary_path
+    cmd = "which " + module
     status, output = run(cmd)
     if status == 0:
-        log.debug('Kdeconnect-cli is installed.')
+        log.debug(f'{module} is installed.')
         return True
     speak('Please install kde connect first.')
-    log.error(f'kdeconnect-cli is not installed. Error: {output}')
+    log.error(f'{module} is not installed. Error: {output}')
     return False
     pass
 
@@ -89,7 +94,8 @@ def ping_device() -> None:
         pass
     else:
         devices = get_avail_devices()
-        log.debug(f'Device id not found in config.ini file. Sending ping to all paired and reachable devices. All found devices {devices}')
+        log.debug(f'Device id not found in config.ini file. Sending ping to all paired and reachable devices. All '
+                  f'found devices {devices}')
         for device in devices:
             run(cmd.format(device_name=device))
     pass
@@ -111,6 +117,29 @@ def ring_device() -> None:
     else:
         devices = get_avail_devices()
         log.debug(f'Device id not found in config.ini file. Ringing all paired and reachable devices. All found devices {devices}')
+        for device in devices:
+            run(cmd.format(device_name=device))
+    pass
+
+
+def send_clipboard():
+    if not check_install(module='xclip') or len(xclip_path) < 2:
+        speak('Error sending clipboard. Xclip is not installed or path is not set in config')
+        log.error('Xclip is not installed. Unable to send clipboard')
+        return
+    last_clipboard = run('/usr/bin/xclip -o')
+    kde_cmd = binary_path + '--name {device_name} --share-text $clipboard'
+    cmd = f'clipboard=$({last_clipboard}) | {kde_cmd}'
+    log.debug(f'Executing cmd for sending clipboard: {cmd}')
+    if DEVICE_NAME != '' and len(DEVICE_NAME) >= 2:
+        log.debug('Device id found in config.ini file.')
+        cmd = cmd.format(device_name=DEVICE_NAME, clipboard=last_clipboard)
+        run(cmd)
+        pass
+    else:
+        devices = get_avail_devices()
+        log.debug(f'Device id not found in config.ini file. Sending ping to all paired and reachable devices. All '
+                  f'found devices {devices}')
         for device in devices:
             run(cmd.format(device_name=device))
     pass

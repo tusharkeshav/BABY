@@ -12,7 +12,11 @@ def run(cmd) -> list:
     return status, output
 
 
-def detect_change():
+def detect_change() -> bool:
+    """
+    It will detect the change in sentence file.
+    :return: True if the changes are detected
+    """
     sentence_path = os.path.join(path, 'sentences.ini')
     tmp_sentence_path = os.path.join(path, 'utilities/.sentence')
     recent_modified_time = str(int(os.stat(sentence_path).st_mtime))

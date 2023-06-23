@@ -213,6 +213,8 @@ def voice_2_intent():
         elif 'ping' in voice2json['slots']['action']:
             SUBMIT_JOB.submit(phone.ping_device)
             pass
+        elif 'send' in voice2json['slots']['action']:
+            SUBMIT_JOB.submit(phone.send_clipboard)
 
     elif intent == 'Skill':
         add_skill()
