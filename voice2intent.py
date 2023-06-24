@@ -49,9 +49,18 @@ def record_analyse() -> list:
     voice2json = run_output(
         '{arecord} -q -r 16000 -c 1 -f S16_LE -t raw | {voice2json} transcribe-stream -c 1 '
         '-a - --wav-sink {wav_file} | /usr/bin/voice2json recognize-intent '.format(wav_file=RECORD_FILE, voice2json=VOICE2JSON, arecord=ARECORD))
-    # log.info(voice2json[1].split('\n'))
+    log.debug('Voice2json raw output: {}'.format(voice2json))
     playsound('sounds/stop.wav')
-    voice2json = json.loads(voice2json[1].split('\n')[7])
+
+    # TODO:-> This is causing error. It's noticed that the value at 7 index is not always correct. Voice2json is
+    #  giving output some randomly. IMPROVE IT
+    # # voice2json = json.loads(voice2json[1].split('\n')[7])
+    # voice2json = json.loads(voice2json[1].split('\n')[-1])
+
+    # Finding the json value using regex instead of relying on splitting string and finding index
+    json_pattern = r'\{.*\}'
+    json_extract = re.search(pattern=json_pattern, string=voice2json[1]).group()
+    voice2json = json.loads(json_extract)
     log.info(f"Generated voice command: {voice2json}")
     if voice2json['text'] == '':
         return None, None
