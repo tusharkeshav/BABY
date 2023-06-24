@@ -172,13 +172,12 @@ def voice_2_intent():
         elif 'sound' in voice2json['slots']:  # set
             value = str(voice2json['slots'].get('sound', 0))
             # speak('Changing sound to {value}'.format(value=value))
-            log.info('Changing sound to {value}'.format(value=value))
             curr_sound = volume.get_volume()
-            log.info('Volume intent value is {}'.format(value))
-            if int(curr_sound) > int(value):
-                speak('Increasing sound to {value}'.format(value=value))
+            log.debug(f'Current sound level: {curr_sound} and User input volume: {value}')
+            if int(curr_sound) < int(value):
+                speak('Increasing volume to {value}'.format(value=value))
             else:
-                speak('Decreasing sound to {value}'.format(value=value))
+                speak('Decreasing volume to {value}'.format(value=value))
             SUBMIT_JOB.submit(volume.change_volume, value)
         pass
     elif intent == 'Bluetooth':
