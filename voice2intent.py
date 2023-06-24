@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 import os
 from logs.Logging import log
@@ -11,7 +12,7 @@ from speech.text2speech import speak
 from utilities.custom_skill import load_custom_skill, check_intent_exist_csv
 from utilities.custom_skill_gui import add_skill
 from config.get_config import get_config
-from utilities.train_model import train_model, detect_change
+from utilities.pre_checks import pre_checks
 
 SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
 RECORD_FILE = get_config('default', 'record_file')
@@ -28,12 +29,6 @@ def run(cmd):
 def run_output(cmd):
     output = subprocess.getstatusoutput(cmd)
     return output
-
-
-def pre_checks():
-    if detect_change():
-        log.info('Sentence file is changed. Training model again.')
-        train_model()
 
 
 def record_analyse() -> list:
