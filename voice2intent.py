@@ -134,7 +134,28 @@ def voice_2_intent():
         random_number.get_random_number()
 
     elif intent == 'Timer':
-        SUBMIT_JOB.submit(timer.main)
+        hours = '00'
+        mins = '00'
+        seconds = '00'
+        msg_hr = msg_min = msg_sec = ''
+        time_format = '{hours}:{mins}:{seconds}'
+        if 'hours' in voice2json['slots']:
+            hours = voice2json['slots']['hours']
+            msg_hr = '{} hours'.format(hours)
+            pass
+        if 'mins' in voice2json['slots']:
+            mins = voice2json['slots']['mins']
+            msg_min = '{} minutes'.format(mins)
+            pass
+        if 'seconds' in voice2json['slots']:
+            seconds = voice2json['slots']['seconds']
+            msg_sec = '{} seconds'.format(seconds)
+        time_format = time_format.format(hours=hours, mins=mins, seconds=seconds)
+        if any([len(msg_hr) != 0, len(msg_min) != 0, len(msg_hr) != 0]):
+            speak('Setting timer for {hr} {min} {sec}'.format(hr=msg_hr, min=msg_min, sec=msg_sec))
+        else:
+            speak('Launching timer. Please select the time.')
+        SUBMIT_JOB.submit(timer.main, time_format)
 
     elif intent == 'StopWatch':
         SUBMIT_JOB.submit(stopwatch.main)
