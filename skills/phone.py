@@ -79,7 +79,7 @@ def pair_device():
     pass
 
 
-def ping_device() -> None:
+def ping_device(message: str = 'Ping!') -> None:
     """
     If id is defined in config file, then it will send ping to that device.
     If id is not found in config, it will send ping to all the devices that are available and reachable in network.
@@ -89,7 +89,7 @@ def ping_device() -> None:
     cmd = binary_path + '--name {device_name} --ping'
     if DEVICE_NAME != '' and len(DEVICE_NAME) >= 2:
         log.debug('Device id found in config.ini file.')
-        cmd = cmd.format(device_name=DEVICE_NAME)
+        cmd = cmd.format(device_name=DEVICE_NAME, message=message)
         run(cmd)
         pass
     else:
@@ -97,7 +97,7 @@ def ping_device() -> None:
         log.debug(f'Device id not found in config.ini file. Sending ping to all paired and reachable devices. All '
                   f'found devices {devices}')
         for device in devices:
-            run(cmd.format(device_name=device))
+            run(cmd.format(device_name=device, message=message))
     pass
 
 

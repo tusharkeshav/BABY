@@ -1,5 +1,6 @@
 import time as T
 import tkinter as tk
+from logs.Logging import log
 
 
 class Timer:
@@ -159,7 +160,7 @@ class Timer:
             # Call the update method again in one second
             self.master.after(1000, self.update)
 
-        elif self.time <=0:
+        elif self.time <= 0:
             from plyer import notification
             notification.notify(
                 title='Timer',
@@ -167,8 +168,13 @@ class Timer:
                 timeout=4  # Display duration in seconds
             )
             T.sleep(2)
+            # Notify Mobile
+            try:
+                from skills.phone import ping_device
+                ping_device(message='Your timer is complete!')
+            except:
+                log.error('Error occurred while sending notification to device')
             self.master.quit()
-            # exit(0)
         else:
             # Stop the timer if the time has run out
             self.stop()
