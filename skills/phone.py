@@ -4,16 +4,9 @@ from logs.Logging import log
 from speech.text2speech import speak
 from config.get_config import get_config, ConfigValueNotFound
 
-binary_path = get_config('phone', 'kdeconnect')
-try:
-    DEVICE_NAME = get_config('phone', 'id')
-except ConfigValueNotFound:
-    DEVICE_NAME = ''
-
-try:
-    xclip_path = get_config('default', 'xclip')
-except ConfigValueNotFound:
-    xclip_path = ''
+kde_path = get_config('phone', 'kdeconnect')
+DEVICE_NAME = get_config('phone', 'id')
+xclip_path = get_config('default', 'xclip')
 
 
 class NoModuleFound(Exception):
@@ -47,7 +40,7 @@ def get_paired_devices() -> list:
     This will list all the devices are paired and reachable.
     :return: List of paired devices
     """
-    cmd = binary_path + '-a --name-only'
+    cmd = kde_path + ' -a --name-only'
     status, output = run(cmd=cmd)
     if output == '':
         return []
@@ -60,7 +53,7 @@ def get_avail_devices() -> list:
     this will list all the devices which are available. It will consider both paired and unpaired devices
     :return:
     """
-    cmd = binary_path + '-l --name-only'
+    cmd = kde_path + ' -l --name-only'
     status, output = run(cmd)
     if output == '':
         log.info('No nearby device found.')
@@ -71,7 +64,7 @@ def get_avail_devices() -> list:
 
 
 def discover_devices():
-    cmd = binary_path
+    cmd = kde_path
     pass
 
 
@@ -86,8 +79,8 @@ def ping_device(message: str = 'Ping!') -> None:
     Note: It assumes the id defined in config file is paired with kdeconnect-cli
     :return: None
     """
-    cmd = binary_path + '--name {device_name} --ping'
-    if DEVICE_NAME != '' and len(DEVICE_NAME) >= 2:
+    cmd = kde_path + ' --name {device_name} --ping-msg {message}'
+    if DEVICE_NAME is not None and len(DEVICE_NAME) >= 2:
         log.debug('Device id found in config.ini file.')
         cmd = cmd.format(device_name=DEVICE_NAME, message=message)
         run(cmd)
@@ -108,8 +101,8 @@ def ring_device() -> None:
     NOTE: It assumes the id defined in config file is paired with kdeconnect-cli
     :return: None
     """
-    cmd = binary_path + '--name {device_name} --ring'
-    if DEVICE_NAME != '' and len(DEVICE_NAME) >= 2:
+    cmd = kde_path + ' --name {device_name} --ring'
+    if DEVICE_NAME is not None and len(DEVICE_NAME) >= 2:
         cmd = cmd.format(device_name=DEVICE_NAME)
         log.debug(f'Device id found in config.ini file. Submitting cmd: {cmd}')
         run(cmd)
@@ -123,17 +116,17 @@ def ring_device() -> None:
 
 
 def send_clipboard():
-    if not check_install(module='xclip') or len(xclip_path) < 2:
+    if xclip_path is None or not check_install(module='xclip') or len(xclip_path) < 2:
         speak('Error sending clipboard. Xclip is not installed or path is not set in config')
-        log.error('Xclip is not installed. Unable to send clipboard')
+        log.error('Xclip is not installed/set in config file. Unable to send clipboard')
         return
-    last_clipboard = run('/usr/bin/xclip -o')
-    kde_cmd = binary_path + '--name {device_name} --share-text $clipboard'
-    cmd = f'clipboard=$({last_clipboard}) | {kde_cmd}'
+    last_clipboard = '/usr/bin/xclip -o'
+    kde_cmd = kde_path + ' --name {device_name} --share-text $clipboard'
+    cmd = f'clipboard=$({last_clipboard}) ; {kde_cmd}'
     log.debug(f'Executing cmd for sending clipboard: {cmd}')
-    if DEVICE_NAME != '' and len(DEVICE_NAME) >= 2:
+    if DEVICE_NAME is None and len(DEVICE_NAME) >= 2:
         log.debug('Device id found in config.ini file.')
-        cmd = cmd.format(device_name=DEVICE_NAME, clipboard=last_clipboard)
+        cmd = cmd.format(device_name=DEVICE_NAME)
         run(cmd)
         pass
     else:

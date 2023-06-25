@@ -12,8 +12,8 @@ class ConfigValueNotFound(Exception):
 
 
 def get_config(section, key):
-    value = config.get(section, key)
+    value = config.get(section, key, fallback=None)
     if str(value) != '':
         return value
     else:
-        raise ConfigValueNotFound()
+        return None
