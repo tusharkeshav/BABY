@@ -81,6 +81,7 @@ def read_section():
 
 def check_intent_exist_csv(intent):
     if intent in sections:
+        log.debug(f'Intent: "{intent}" already exist. Sections: {sections}')
         return True
     return False
 
@@ -150,7 +151,7 @@ def write_custom_skill(intent, action, sentences, file_path):
     """
     row = [intent, action, sentences, file_path]
     log.info(f'Creating steps to add new skill. Skill data: {row}')
-    with open(skills, 'a') as csv_file:
+    with open(skills, 'a', newline='\n') as csv_file:
         csv_write = csv.writer(csv_file).writerow(row)
         csv_file.close()
     create_section_single(intent, action, sentences.replace(';', '\n'))  # This will create single section and update the sentence file
