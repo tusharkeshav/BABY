@@ -246,5 +246,17 @@ def voice_2_intent():
     elif check_intent_exist_csv(intent=intent):
         SUBMIT_JOB.submit(load_custom_skill, intent)
 
+    elif intent == 'SearchImage':
+        from skills import search_similar_images
+        if 'detect' in voice2json['slots']['action']:
+            search_similar_images.get_image_header()
+            pass
+        elif 'similar' in voice2json['slots']['action']:
+            search_similar_images.search_similar_image()
+            pass
+        elif 'buy' in voice2json['slots']['action']:
+            search_similar_images.get_buy_link_if_any()
+            pass
+
     else:
         speak('Sorry I don\'t understand this. Can you please repeat')
