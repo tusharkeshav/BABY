@@ -34,6 +34,8 @@ def detect_wake_word():
 
     except KeyboardInterrupt:
         recoder.stop()
+    except Exception as e:
+        log.exception(f'Exception occurred while reading and analyzing. Exception: {e}')
     finally:
         recoder.delete()
 
