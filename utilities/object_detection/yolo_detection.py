@@ -204,7 +204,8 @@ def get_object_from_live_stream():
         if count >= 30:
             break
         ret, frame = cam.read()
-        results = model.predict(frame, conf=0.1, classes=classes, max_det=1)
+        results = model.predict(frame, conf=0.1, classes=classes, max_det=1) if configured_log_level == 'DEBUG' \
+            else model.predict(frame, conf=0.1, classes=classes, max_det=1, verbose=False)
         # cv2.imshow("Object Detection", results[0].plot(labels=False))
 
         processed_frame = results[0].plot()
@@ -234,7 +235,7 @@ def get_object_from_live_stream():
                 r = box.xyxy[0].astype(int)
                 crop = frame[r[1]:r[3], r[0]:r[2]]
                 box_center = find_centre(r[0], r[1], r[2], r[3])
-                print('two point distance is: ' + str(two_point_distance(center, box_center)))
+                # print('two point distance is: ' + str(two_point_distance(center, box_center)))
                 detected_img.append(
                     (r, crop, box.conf, two_point_distance(center, box_center))
                 )

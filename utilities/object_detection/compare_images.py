@@ -36,8 +36,8 @@ def is_image_similar(img1, img2) -> bool:
     # Calculate the Structural Similarity Index (SSIM)
     ssim_score = ssim(image1, image2, multichannel=True)
 
-    print("Mean Squared Error (MSE):", mse)
-    print("Structural Similarity Index (SSIM):", ssim_score)
+    # print("Mean Squared Error (MSE):", mse)
+    # print("Structural Similarity Index (SSIM):", ssim_score)
 
     if (ssim_score >= 0.5) or (0.0 > ssim_score > 0.499 and mse < 100.00):
         return True
