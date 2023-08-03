@@ -16,7 +16,7 @@ porcupine_custom = pvporcupine.create(access_key=get_config(SECTION, 'access_key
                                       keywords=keyword_custom)
 porcupine_default = pvporcupine.create(access_key=get_config(SECTION, 'access_key'),
                                        model_path=get_config(SECTION, 'wake_word_default_model'),
-                                       keywords=keyword_default)
+                                       keywords=keyword_default, sensitivities=[0.4, 0.4, 0.4, 0.4])
 
 
 def detect_wake_word():
@@ -27,8 +27,15 @@ def detect_wake_word():
         recoder.start()
         while True:
             recorded_frame = recoder.read()
-            if any([porcupine_custom.process(recorded_frame) >= 0, porcupine_default.process(recorded_frame) >= 0]):
-                log.debug('word detected')
+
+            detected_keyword_default = porcupine_default.process(recorded_frame)
+            if detected_keyword_default >= 0:
+                log.debug(f'Detected keyword is: {keyword_default[detected_keyword_default]}')
+                recoder.stop()
+                return True
+            detected_keyword_custom = porcupine_custom.process(recorded_frame)
+            if detected_keyword_custom >= 0:
+                log.debug(f'Detected keyword is: {keyword_custom[detected_keyword_custom]}')
                 recoder.stop()
                 return True
 
