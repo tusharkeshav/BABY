@@ -14,5 +14,6 @@ FORMAT = "[%(asctime)s %(filename)s->%(funcName)s():%(lineno)s]%(levelname)s: %(
 logging.basicConfig(filename=LOG_FILE_PATH, format=FORMAT,  encoding='utf-8')
 
 log = logging.getLogger(__name__)
-log_level = log_level_info[get_config('default', 'log_level', fallback='INFO').upper()]
+configured_log_level = get_config('default', 'log_level', fallback='INFO').upper()
+log_level = log_level_info[configured_log_level]
 log.setLevel(log_level)
