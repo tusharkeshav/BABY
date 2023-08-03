@@ -31,7 +31,7 @@ def run_output(cmd):
     return output
 
 
-def record_analyse() -> list:
+def record_analyse() -> tuple:
     """
     Record and feed to intent recognition.
     :return:
@@ -100,18 +100,14 @@ def voice_2_intent():
                 speak('Increasing Brightness')
                 SUBMIT_JOB.submit(change_brightness.increase_brightness)
             elif 'decrease' in voice2json['slots']['action']:  # decrease
+                speak('Decreasing Brightness')
                 SUBMIT_JOB.submit(change_brightness.decrease_brightness)
         elif 'brightness' in voice2json['slots']:  # set
-            value = str(voice2json['slots'].get('brightness', 0))
-            speak('Changing bright Brightness to {value}'.format(value=value))
+            # Note we have to use default value (0) in below variable.
+            # the issue is with voice2json. Its not converting 0. it passed empty when 0 is said
+            value = str(voice2json['slots'].get('brightness', 0)) or 0
             log.info('Changing bright Brightness to {value}'.format(value=value))
-            curr_brightness = change_brightness.get_brightness()
-            log.info('value is {}'.format(value))
-            if int(curr_brightness) > int(value):
-                speak('Increasing brightness to {value}'.format(value=value))
-            else:
-                speak(f'Decreasing brightness to {value}'.format(value=value))
-            SUBMIT_JOB.submit(change_brightness.increase_brightness, value)
+            SUBMIT_JOB.submit(change_brightness.set_brightness, int(value))
 
     elif intent == 'CheckWeather':
         weather.get_weather()
