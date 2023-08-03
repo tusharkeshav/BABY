@@ -1,13 +1,26 @@
 import math
 import gc
-from ultralytics import YOLO
-import cv2
 import os
+import subprocess
+import sys
+try:
+    """Note: To reduce package size, we will be installing Yolo at fly."""
+    from ultralytics import YOLO
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "ultralytics==8.0.125"])
+    from ultralytics import YOLO
+
+try:
+    import cv2
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "opencv-python==4.8.0.74"])
+    import cv2
+
 from utilities.object_detection.compare_images import is_image_similar
 from utilities.object_detection.blur_detect import blur_score
 from config.get_config import get_config
 
-from logs.Logging import log
+from logs.Logging import log, configured_log_level
 path = os.path.dirname(os.path.abspath(__file__))
 model = YOLO(os.path.join(path, 'yolov8n.pt'))
 
@@ -197,15 +210,21 @@ def get_object_from_live_stream():
         processed_frame = results[0].plot()
         frame_height = processed_frame.shape[0]
         frame_width = processed_frame.shape[1]
-        center = (frame_width // 2, frame_height // 2)  # (x,y) or say (width, height)
-        # color = (0, 255, 0)
-        thickness = 1
-        # print("Height of image " + str(image.shape[0]))
-        # boxes = results[0].boxes.cpu().numpy()
-        # box = boxes[0].xyxy[0].astype(int)
-        # start_pt = find_centre(box[0], box[1], box[2], box[3])
-        # img = cv2.line(processed_frame, start_pt, center, color, thickness)
-        cv2.imshow("Object Detection", results[0].plot())
+        start_pt = center = (frame_width // 2, frame_height // 2)  # (x,y) or say (width, height)
+        if configured_log_level == 'DEBUG':
+            color = (0, 255, 0)
+            thickness = 1
+            try:
+                boxes = results[0].boxes.cpu().numpy()
+                box = boxes[0].xyxy[0].astype(int)
+                start_pt = find_centre(box[0], box[1], box[2], box[3])
+            except:
+                pass
+            img = cv2.line(processed_frame, start_pt, center, color, thickness)
+            cv2.imshow("Object Detection", img)
+
+        else:
+            cv2.imshow("Object Detection", results[0].plot(labels=False))
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
