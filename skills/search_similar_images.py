@@ -60,7 +60,7 @@ def base_method_img_details(image: str = None):
     return soup
 
 
-def get_image_header_detail(html: str = None) -> str:
+def get_image_header_detail(html: str = None) -> tuple:
     """
     Steps:
     1. Get image
@@ -79,27 +79,70 @@ def get_image_header_detail(html: str = None) -> str:
             if len(header_data) != 0:
                 header = header_data[0].get_text()
                 log.debug(f"Extracted image header: {header}")
-                return header
+                return header, None
     except Exception as e:
         log.exception(f'Exception occurred while fetching image header: {e}')
 
-    return None
+    return None, html
+
+
+def get_all_image_info(html=None):
+    from utilities.similar_image_display import display_result
+    if html is None:
+        html = base_method_img_details()
+    soup = BS(html, 'html.parser')
+    data = {}
+    result = []
+    try:
+        div1 = soup.select('.aah4tc > div:nth-child(1)')  # > div:nth-child(5) > div:nth-child(1)')
+        max_iteration = 10
+        ind = 1
+
+        while True:
+            div2 = div1[0].select(f'div:nth-child({ind}) > div:nth-child(1) > a:nth-child(1)')
+            if len(div2) == 0 or max_iteration == 0:
+                break
+            url = div2[0].get('href')
+            div3 = div2[0].select('div:nth-child(1)')
+            title = div3[0].get('data-item-title')
+            image_url = div3[0].get('data-thumbnail-url')
+
+            data = {
+                'image_url': image_url,
+                'info': title,
+                'url': url
+            }
+            result.append(data)
+
+            print(f'title of image: {title}')
+            print(f'image url: {image_url}')
+            print(f'url: {url}')
+            ind += 1
+            max_iteration -= 1
+    except Exception as e:
+        log.exception(f'Exception occurred while trying to extract buying link: {e}')
+        if len(result) >= 2:
+            display_result(result)
+            return result
+    display_result(result)
+    return result
 
 
 def get_image_header():
-    header = get_image_header_detail()
+    header, html = get_image_header_detail()
     if header is not None:
         print(f'I think it is {header}')
         speak(f'It looks like it is {header}')
     else:
         # speak('I am finding difficulty while searching object. But, here something related to this object ')
         speak('Here is what I found.')
-        search_similar_images_from_image()
+        # search_similar_images_from_image()
+        get_all_image_info(html)
 
 
 def search_amazon_for_product(html: str = None):
     amazon_search_link = 'https://www.amazon.in/s?k={query}'
-    header = get_image_header_detail(html)
+    header = get_image_header_detail(html)[0]
     if header is not None:
         speak('Searching amazon for something similar.')
         header = header.replace(' ', '+')
@@ -149,7 +192,8 @@ def get_buy_link_if_any():
         log.exception(f'Exception occurred while trying to extract buying link: {e}')
 
     speak('I cant find anything you asked for. Showing all similar found.')
-    webbrowser.open(web_page_path)
+    # webbrowser.open(web_page_path)
+    get_all_image_info(html_page)
 
 
 def search_similar_image():

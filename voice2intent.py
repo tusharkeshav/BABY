@@ -13,6 +13,7 @@ from utilities.custom_skill import load_custom_skill, check_intent_exist_csv
 from utilities.custom_skill_gui import add_skill
 from config.get_config import get_config
 from utilities.pre_checks import pre_checks
+from utilities.similar_image_display import display_result
 
 SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
 RECORD_FILE = get_config('default', 'record_file')
@@ -248,7 +249,8 @@ def voice_2_intent():
             search_similar_images.get_image_header()
             pass
         elif 'similar' in voice2json['slots']['action']:
-            search_similar_images.search_similar_image()
+            result = search_similar_images.get_all_image_info()
+            display_result(result)
             pass
         elif 'buy' in voice2json['slots']['action']:
             search_similar_images.get_buy_link_if_any()
