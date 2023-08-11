@@ -126,6 +126,10 @@ def voice_2_intent():
         random_number.get_random_number()
 
     elif intent == 'Timer':
+        likelihood = float(voice2json['likelihood'])
+        if likelihood < 0.7:
+            speak('Sorry I don\'t understand this. Can you please repeat')
+            return
         hours = '00'
         mins = '00'
         seconds = '00'
