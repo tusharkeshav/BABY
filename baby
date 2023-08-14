@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
-APPDIR='/home/akhil/PycharmProjects/voice2json_project'
+APPDIR='/usr/bin/baby'
 
-#export PATH="${APPDIR}/bin:${APPDIR}/usr/local/bin:${PATH}"
-#export LD_LIBRARY_PATH="${APPDIR}/lib:${APPDIR}/usr/local/lib:${LD_LIBRARY_PATH}"
+export PATH="${APPDIR}/bin:${APPDIR}/usr/local/bin:${PATH}"
+export LD_LIBRARY_PATH="${APPDIR}/lib:${APPDIR}/usr/local/lib:${LD_LIBRARY_PATH}"
 
-#export voice2json_dir="${APPDIR}/share/voice2json"
-#export KALDI_DIR="${APPDIR}/lib/kaldi"
+export PYTHONPATH="/usr/lib/baby/"
 
-export PYTHONPATH="/home/akhil/PycharmProjects/voice2json_project/"
-
-"${APPDIR}/venv/bin/python" -m BABY
+"${APPDIR}/venv/bin/python" -m /usr/lib/baby/.
