@@ -171,8 +171,10 @@ def voice_2_intent():
         log.info(value)
         if value in ('resume', 'pause', 'stop', 'play'):
             log.info("Media intent value is {}".format(value))
+            speak(f'Sure. {value} video')
             SUBMIT_JOB.submit(media.pause_resume_toggle)
         elif value == 'mute':
+            speak('Sure. Muting the sound')
             SUBMIT_JOB.submit(media.mute)
         elif value == 'next':
             SUBMIT_JOB.submit(media.next_media)
