@@ -1,0 +1,10 @@
+Package: b.a.b.y
+Source: b-a-b-y
+Version: 1.0-1
+Architecture: all
+Maintainer: ruletushar@gmail.com
+Installed-Size: 598300
+Depends: python3:any, python3-tk, sox, alsa-tools, wget, espeak, jq, libstdc++6, perl, libportaudio2, libatlas3-base, libffi-dev
+Section: python
+Priority: optional
+Description: Linux Virtual Assistant
