@@ -15,7 +15,7 @@ netflix_dork = '{movie} site:netflix.com'
 prime_dork = '{movie} site:primevideo.com/detail'
 
 netflix_keywords = ['offical', 'watch', 'netflix', 'site']
-prime_keywords = ['prime', 'video']
+prime_keywords = ['prime', 'video', 'amazon']
 
 
 def _get_original_link(url: str, engine: str) -> str:
@@ -108,10 +108,11 @@ def search_netflix(file: str):
             speak('Here is your search result')
         else:
             raise search_engine_parser.core.exceptions.NoResultsFound
-    except search_engine_parser.core.exceptions.NoResultsFound as e:
+    except (search_engine_parser.core.exceptions.NoResultsFound, IndexError) as e:
         speak('No search results found for movie name {query} on netflix'.format(query=movie))
         log.debug('No search results were found for {query} on netflix'.format(query=movie))
     except Exception as e:
+        speak('Some error occurred while searching netflix.')
         log.exception(
             'Some unknown error occurred while searching for Netflix. Exception: {exception}'.format(exception=e))
 
@@ -130,7 +131,7 @@ def search_prime(file: str):
             return
     try:
         log.debug('Searched query on prime: {query}'.format(query=netflix_dork.format(movie=movie)))
-        result = ().search(query=prime_dork.format(movie=movie), page=1)
+        result = DuckDuckGo().search(query=prime_dork.format(movie=movie), page=1)
         # prime_url = _get_original_link(result[0]['raw_urls'], engine='google')
         prime_url = _get_original_link(result[0]['links'], engine='duckduckgo')
         if confidence(movie, result[0]['titles'], filter_keywords=prime_keywords):
@@ -138,10 +139,11 @@ def search_prime(file: str):
             speak('Here is your search result')
         else:
             raise search_engine_parser.core.exceptions.NoResultsFound
-    except search_engine_parser.core.exceptions.NoResultsFound as e:
+    except (search_engine_parser.core.exceptions.NoResultsFound, IndexError) as e:
         speak('No search results found for movie name {query} on amazon prime'.format(query=movie))
         log.debug('No search results were found for {query} on amazon prime'.format(query=movie))
     except Exception as e:
+        speak('Some error occurred while searching amazon prime.')
         log.exception(
             'Some unknown error occurred while searching for amazon prime. Exception: {exception}'.format(exception=e))
 
