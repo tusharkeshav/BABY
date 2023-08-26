@@ -1,9 +1,15 @@
 import os.path
 import webbrowser
+import subprocess
+import sys
 from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup as BS
-import cv2
+try:
+    import cv2
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "opencv-python==4.8.0.74"])
+    import cv2
 
 from utilities.object_detection.yolo_detection import get_object_from_live_stream
 from utilities.img_search import reverse_image_search, reverse_image_search_details
