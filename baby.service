@@ -9,7 +9,8 @@ ExecStart=/usr/lib/baby/usr/local/bin/python3 .
 # optional items below
 Restart=always
 RestartSec=3
-# replace /home/user/.virtualenv/bin/python with your virtualenv and main.py with your script
+StandardOutput=append:/tmp/baby.log
+StandardError=append:/tmp/baby.log
 
 [Install]
 WantedBy=multi-user.target
