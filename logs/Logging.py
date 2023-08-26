@@ -11,7 +11,7 @@ log_level_info = {'DEBUG': logging.DEBUG,
                   }
 
 FORMAT = "[%(asctime)s %(filename)s->%(funcName)s():%(lineno)s]%(levelname)s: %(message)s"
-logging.basicConfig(filename=LOG_FILE_PATH, format=FORMAT,  encoding='utf-8')
+logging.basicConfig(filename=LOG_FILE_PATH, format=FORMAT)
 
 log = logging.getLogger(__name__)
 configured_log_level = get_config('default', 'log_level', fallback='INFO').upper()
