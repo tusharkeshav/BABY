@@ -1,0 +1,15 @@
+[Unit]
+Description=Baby Virtual Assistant
+
+[Service]
+User=__USERNAME__
+Environment="XDG_RUNTIME_DIR=/run/user/__ID__"
+WorkingDirectory=/usr/lib/baby/
+ExecStart=/usr/lib/baby/usr/local/bin/python3 .
+# optional items below
+Restart=always
+RestartSec=3
+# replace /home/user/.virtualenv/bin/python with your virtualenv and main.py with your script
+
+[Install]
+WantedBy=multi-user.target
