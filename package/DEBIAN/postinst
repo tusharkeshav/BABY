@@ -9,4 +9,9 @@ if command -v pypy3compile >/dev/null 2>&1; then
 	pypy3compile -p b.a.b.y  || true
 fi
 
+user=$(logname)
+id=$(id -u $user)
+sed -i "s/__USERNAME__/$user/" /lib/systemd/system/baby.service
+sed -i "s/__ID__/$id/" /lib/systemd/system/baby.service
+
 # End automatically added section
