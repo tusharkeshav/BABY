@@ -3,11 +3,13 @@ import webbrowser
 import subprocess
 import sys
 from urllib.parse import urlparse
+from speech.text2speech import speak
 
 from bs4 import BeautifulSoup as BS
 try:
     import cv2
 except ImportError:
+    speak('Looks like you are using this feature for first time. Downloading few additional files. Please wait')
     subprocess.check_call([sys.executable, "-m", "pip", "install", "opencv-python==4.8.0.74"])
     import cv2
 
