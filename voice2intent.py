@@ -19,6 +19,8 @@ SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
 RECORD_FILE = get_config('default', 'record_file')
 VOICE2JSON = get_config('default', 'voice2json')
 ARECORD = get_config('default', 'arecord')
+# CONFIDENCE can range from 0.0 to 1.0
+CONFIDENCE = float(get_config('default', 'confidence'))
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -89,6 +91,9 @@ def voice_2_intent():
     log.info(f'intent is {intent}')
     if intent is None:
         return
+    if float(voice2json['likelihood']) == CONFIDENCE:
+        no_result()
+        return
     if intent == 'Terminal':
         speak('Opening terminal')
         cmd = 'gnome-terminal'
@@ -128,7 +133,7 @@ def voice_2_intent():
     elif intent == 'Timer':
         likelihood = float(voice2json['likelihood'])
         if likelihood < 0.7:
-            speak('Sorry I don\'t understand this. Can you please repeat')
+            no_result()
             return
         hours = '00'
         mins = '00'
@@ -263,4 +268,8 @@ def voice_2_intent():
             pass
 
     else:
-        speak('Sorry I don\'t understand this. Can you please repeat')
+        no_result()
+
+
+def no_result():
+    speak('Sorry I don\'t understand this. Can you please repeat')
