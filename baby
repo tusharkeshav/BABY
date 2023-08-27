@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-APPDIR='/usr/bin/baby'
+APPDIR='/usr/lib/baby'
 
 export PATH="${APPDIR}/bin:${APPDIR}/usr/local/bin:${PATH}"
 export LD_LIBRARY_PATH="${APPDIR}/lib:${APPDIR}/usr/local/lib:${LD_LIBRARY_PATH}"
 
 export PYTHONPATH="/usr/lib/baby/"
 
-"${APPDIR}/venv/bin/python" -m /usr/lib/baby/.
+"${APPDIR}/usr/local/bin/python3" -m /usr/lib/baby/.
