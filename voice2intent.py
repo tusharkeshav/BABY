@@ -221,9 +221,9 @@ def voice_2_intent():
             # SUBMIT_JOB.submit(youtube.search_song, RECORD_FILE)
         elif 'spotify' in voice2json['slots']['app']:
             from skills import spotify
+            SUBMIT_JOB.submit(speak, 'Searching Spotify.')
             spotify.search_song(RECORD_FILE)
             # SUBMIT_JOB.submit(spotify.search_song, RECORD_FILE)
-            SUBMIT_JOB.submit(speak, 'Searching Spotify.')
 
     elif intent == 'SearchMovie':
         from skills import search_movie
@@ -233,10 +233,6 @@ def voice_2_intent():
         elif 'prime' in voice2json['slots']['app']:
             SUBMIT_JOB.submit(speak, "Searching prime videos")
             search_movie.search_prime(RECORD_FILE)
-
-    elif intent == 'SearchSpotify':
-        from skills import spotify
-        SUBMIT_JOB.submit(spotify.search_song, RECORD_FILE)
 
     elif intent == 'Phone':
         if 'ring' in voice2json['slots']['action']:

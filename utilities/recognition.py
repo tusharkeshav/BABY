@@ -2,7 +2,7 @@ import speech_recognition as sr
 from logs.Logging import log
 
 keyword_delete = ['find', 'play', 'youtube', 'music', 'search song on', 'search song', 'search', 'song on', 'spotify'
-                  'movie', 'movie on', 'movie in', 'netflix', 'search movie']
+                  'movie', 'movie on', 'movie in', 'netflix', 'search movie', 'spotify', 'video', 'sad']
 
 
 def _clean_query(query: str, filter_keywords: bool) -> str:
