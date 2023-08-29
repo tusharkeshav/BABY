@@ -4,6 +4,7 @@ Description=Baby Virtual Assistant
 [Service]
 User=__USERNAME__
 Environment="XDG_RUNTIME_DIR=/run/user/__ID__"
+Environment="DISPLAY=:1"
 WorkingDirectory=/usr/lib/baby/
 ExecStart=/usr/lib/baby/usr/local/bin/python3 .
 # optional items below
