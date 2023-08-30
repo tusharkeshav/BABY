@@ -4,7 +4,7 @@ from utilities.train_model import train_model
 from logs.Logging import log
 
 file_path = os.path.abspath(__file__)
-folder_path = os.path.dirname(file_path)
+folder_path = os.path.dirname(os.path.dirname(file_path))
 HOME = os.environ['HOME']
 linux_essential_dependencies = ['python3-tk',
                                 'sox',
@@ -66,7 +66,7 @@ def download_profile():
 
 
 def install_python_requirements():
-    cmd = f'{folder_path}/venv/bin/python -m pip install -r {file_path}/requirement.txt'
+    cmd = f'{folder_path}/usr/local/bin/python3 -m pip install -r {folder_path}/requirements.txt'
     run(cmd)
 
 
