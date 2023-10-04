@@ -16,13 +16,14 @@ linux_essential_dependencies = ['python3-tk',
                                 'perl',
                                 'libportaudio2',
                                 'libatlas3-base',
-                                'libffi-dev']
+                                'libffi-dev',
+                                'portaudio19-dev']
 
 linux_optional_dependencies = ['rfkill',
                                'kdeconnect',
                                'xdotools']
 
-install_broken_dependencies = 'apt install -f'
+install_broken_dependencies = 'sudo apt-get install -f'
 
 
 def run(cmd: str, raise_error: bool = True) -> tuple:
@@ -34,7 +35,7 @@ def run(cmd: str, raise_error: bool = True) -> tuple:
 
 
 def install_linux_dependencies():
-    cmd = 'sudo apt install -y {package}'
+    cmd = 'sudo apt-get install -y {package}'
     for dependency in linux_essential_dependencies:
         log.info(f'Installing essential dependency: {dependency}')
         print(f'Installing essential dependency: {dependency}')
@@ -79,7 +80,7 @@ def install_voice2json():
 
     log.info('Installing Voice2json')
     print('Installing Voice2json')
-    install_voice2json = 'dpkg -i /tmp/voice2json_2.1_amd64.deb'
+    install_voice2json = 'sudo dpkg -i /tmp/voice2json_2.1_amd64.deb'
     run(cmd=install_voice2json)
 
     run(cmd=install_broken_dependencies)
@@ -92,7 +93,7 @@ def install_voice2json():
                            '-1ubuntu2.19_amd64.deb '
         run(cmd=lib_ssl_download)
 
-        lib_ssl_binary_install = 'dpkg -i /tmp/libssl1.1_1.1.1f-1ubuntu2.19_amd64.deb'
+        lib_ssl_binary_install = 'sudo dpkg -i /tmp/libssl1.1_1.1.1f-1ubuntu2.19_amd64.deb'
         run(cmd=lib_ssl_binary_install)
         run(cmd=install_broken_dependencies)
 
@@ -100,7 +101,7 @@ def install_voice2json():
         print('Downloading and installing Libffi')
         libffi_binary_download = 'cd /tmp && wget http://archive.ubuntu.com/ubuntu/pool/main/libf/libffi/libffi6_3.2' \
                                  '.1-8_amd64.deb '
-        libffi_binary_install = 'dpkg -i /tmp/libffi6_3.2.1-8_amd64.deb'
+        libffi_binary_install = 'sudo dpkg -i /tmp/libffi6_3.2.1-8_amd64.deb'
         run(cmd=libffi_binary_download)
         run(cmd=libffi_binary_install)
         run(cmd=install_broken_dependencies)
