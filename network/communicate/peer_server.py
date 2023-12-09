@@ -11,6 +11,7 @@ def create_connection(host: str, port: int):
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
 
     # Bind the socket to a specific address and port
+    print(f"Creating TCP connection with host: {host} and port: {port}")
     server_socket.bind((host, port))
 
     # Listen for incoming connections
@@ -26,7 +27,10 @@ def create_connection(host: str, port: int):
 
 # Function to handle incoming messages
 def receive_messages(client_socket):
-    while True:
+    print("socket: " +  str(client_socket))
+    print(is_socket_closed(client_socket))
+    if is_socket_closed(client_socket): print("Client socket is closed")
+    while True and not is_socket_closed(client_socket):
         try:
             message = client_socket.recv(1024).decode()
             if not message:
@@ -44,6 +48,7 @@ def send_message(message):
 
 
 def is_socket_closed(sock: socket.socket) -> bool:
+    if sock is None:    return True
     try:
         # this will try to read bytes without blocking and also without removing them from buffer (peek only)
         data = sock.recv(16, socket.MSG_DONTWAIT | socket.MSG_PEEK)
@@ -62,7 +67,9 @@ def is_socket_closed(sock: socket.socket) -> bool:
 def listen_tcp():
     # Accept a connection
     global sock
-    sock = create_connection(host='localhost', port=Network.COMMUNICATION_PORT.value)
+    if is_socket_closed(sock):
+        print("Pinting sock: " + str(sock))
+        sock = create_connection(host='0.0.0.0', port=Network.COMMUNICATION_PORT.value)
 
     # Start a thread to receive messages
     receive_thread = threading.Thread(target=receive_messages, args=(sock,))
