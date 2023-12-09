@@ -2,8 +2,9 @@ import socket
 
 from network.network_enums import Network
 from network.device_id import get_device_id, set_device_id
+from logs.Logging import log
 
-LISTEN_MAX_TIME_LIMIT = 100
+LISTEN_MAX_TIME_LIMIT = 1000
 
 
 def listen():
@@ -19,12 +20,14 @@ def listen():
         # sock.sendto(bytes("hello", "utf-8"), ip_co)
         data, addr = sock.recvfrom(1024)
         print(data)
+        print(addr)
         # below we don't wanted to detect loopback request.
         # we need to filter the received broadcast packet from same device
         if len(data) > 0:
+            #### msg should be in format:- <device-id>:msg
             data_chunk = data.decode().split(':')
             device_id, data = data_chunk[0], data_chunk[1]
-            if device_id != get_device_id():
+            if str(device_id) != str(get_device_id()):
                 print(f'Found device ID: {data} and address: {addr}')
                 return data, addr[0]
 

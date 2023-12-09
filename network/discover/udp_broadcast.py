@@ -50,7 +50,7 @@ def check_valid_ip(ip_list: list):
 def broadcast_all_ip():
     all_ips = subprocess.check_output(['hostname', '--all-ip-addresses']).decode().split(' ')
     all_ips = check_valid_ip(all_ips)
-    msg = b'hello world'
+    msg = b'1234567890:hello world'
     print(f'sending broadcast')
     while True:
         for ip in all_ips:

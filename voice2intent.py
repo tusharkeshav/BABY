@@ -283,7 +283,7 @@ def voice_2_intent():
         # optional: Check who is connected
         message = ''
         from network.communicate import peer_client, communicate
-        if peer_client.is_socket_closed(peer_client.sock):
+        if not peer_client.is_socket_closed(peer_client.sock):
             # check if socket is closed or not.
             peer_client.send_message(message=message)
             pass

@@ -3,8 +3,8 @@ import threading
 
 from network.network_enums import Network
 from network.communicate import peer_server
-from udp_broadcast import broadcast, close, broadcast_all_ip
-from udp_listen import listen
+from network.discover.udp_broadcast import broadcast, close, broadcast_all_ip
+from network.discover.udp_listen import listen
 
 """
 NOTE:

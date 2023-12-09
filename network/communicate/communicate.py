@@ -1,5 +1,5 @@
-import peer_server
-import peer_client
+# import peer_server
+from network.communicate import peer_client
 from network.network_enums import Network
 from network.discover.udp_listen import listen
 
@@ -81,5 +81,5 @@ def discover_and_send_message(cmd=None):
     pass
 
 
-def discover_device():
-    discover_and_send_message(cmd=None)
+# def discover_device():
+#     discover_and_send_message(cmd=None)
