@@ -46,7 +46,9 @@ def record_analyse() -> tuple:
     # voice2json = run('/usr/bin/voice2json transcribe-wav < /tmp/abc.wav | voice2json recognize-intent')
     voice2json = run_output(
         '{arecord} -q -r 16000 -c 1 -f S16_LE -t raw | {voice2json} transcribe-stream -c 1 '
-        '-a - --wav-sink {wav_file} | /usr/bin/voice2json recognize-intent '.format(wav_file=RECORD_FILE, voice2json=VOICE2JSON, arecord=ARECORD))
+        '-a - --wav-sink {wav_file} | /usr/bin/voice2json recognize-intent '.format(wav_file=RECORD_FILE,
+                                                                                    voice2json=VOICE2JSON,
+                                                                                    arecord=ARECORD))
     log.debug('Voice2json raw output: {}'.format(voice2json))
     playsound('sounds/stop.wav')
 
@@ -79,12 +81,22 @@ def indentify_intent(force=True):
     intent = run_output(f'/usr/bin/voice2json recognize-intent --text-input {query}')
 
 
+def broadcast_device():
+    """
+    This method will be responsible to broadcast the device on server so that others can connect it
+    """
+    from network.discover import discovery
+    SUBMIT_JOB.submit(discovery.broadcast_and_connect)
+    pass
+
+
 def voice_2_intent():
     """
     Action that will be performed. In other words, it mainitain all the skills
     :return:
     """
     pre_checks()
+    broadcast_device()
     from utilities.listening_animation import get_data
 
     intent, voice2json = get_data(calling_func='voice2intent')
@@ -262,6 +274,36 @@ def voice_2_intent():
         elif 'buy' in voice2json['slots']['action']:
             search_similar_images.get_buy_link_if_any()
             pass
+
+    elif intent == 'SendCommand':
+        # This will send command to other assistant
+        # How to?
+        # First check if tcp connection is established. If yes then fine. Communicate over that socket
+        # if not then we have to open another
+        # optional: Check who is connected
+        message = ''
+        from network.communicate import peer_client, communicate
+        if peer_client.is_socket_closed(peer_client.sock):
+            # check if socket is closed or not.
+            peer_client.send_message(message=message)
+            pass
+
+        else:
+            # Open new socket.
+            communicate.discover_and_send_message(cmd=message)
+            pass
+
+        pass
+
+    elif intent == 'SearchDevice':
+        from network.communicate import peer_client, communicate
+        if peer_client.is_socket_closed(peer_client.sock):
+            speak('You are already connect to device')
+        else:
+            speak('Discovering device over network')
+            communicate.discover_device()
+
+
 
     else:
         no_result()
