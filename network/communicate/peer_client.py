@@ -1,19 +1,31 @@
 import socket
 from network.message import message_deformatter
+from logs.Logging import log
 
 
 sock: socket.socket = None
 
 
 def _tcp_connect(host: str, port: int):
-    _sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    MAX_RETRY = 5
+    _sock = None
+    retry = 1
+    while retry <= MAX_RETRY:
+        try:
+            _sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    # Connect to Assistant 1's socket
-    _sock.connect((host, port))
+            # Connect to Assistant 1's socket
+            _sock.connect((host, port))
 
-    _sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+            _sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
 
-    return _sock
+            return _sock
+
+        except Exception as e:
+            if retry == MAX_RETRY:
+                print(f'Error occurred while opening TCP socket: {e}')
+                raise Exception(f'Error occurred while creating TCP connection.\nException: {e}')
+        retry += 1
 
 
 # Function to handle incoming messages
@@ -38,7 +50,7 @@ def tcp_server(host: str, port: int):
         print('Socket is still open. Using same socket connection')
 
     # Start a thread to receive messages
-    # receive_thread = threading.Thread(target=receive_messages, args=(sock,))
+    # receive_thread = threading.Thread(monitor=receive_messages, args=(sock,))
     # receive_thread.start()
 
 

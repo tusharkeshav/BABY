@@ -4,11 +4,20 @@ from network.network_enums import Network
 
 
 sock: socket.socket = None
+msg = []
 
 
 def create_connection(host: str, port: int):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+
+    # NOTE: REASON WHY TO USE SO_REUSEADDR?
+    # ANS: There is socket time wait. If connection is close non gracefully,
+    # it will get into time_wait causing delays and that specific port won't be able
+    # to free for use for sometime(probabaly ~4 mins)
+    # Similar: https://stackoverflow.com/q/5106674/9730403
+
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     # Bind the socket to a specific address and port
     print(f"Creating TCP connection with host: {host} and port: {port}")
@@ -26,16 +35,22 @@ def create_connection(host: str, port: int):
 
 
 # Function to handle incoming messages
-def receive_messages(client_socket):
+def receive_messages(client_socket=sock):
     print("socket: " +  str(client_socket))
     print(is_socket_closed(client_socket))
     if is_socket_closed(client_socket): print("Client socket is closed")
-    while True and not is_socket_closed(client_socket):
+    while True:
         try:
-            message = client_socket.recv(1024).decode()
-            if not message:
-                break
-            print(f'Received from Assistant 2: {message}')
+            if not is_socket_closed(client_socket):
+                message = client_socket.recv(1024).decode()
+                print(f"message is: {message}")
+                if not message:
+                    print('Message received is Null. Connection is terminated.')
+                    break
+                print(f'Received from Assistant 2: {message}')
+                global msg
+                msg.append(message)
+                return message
         except ConnectionResetError:
             print('Connection break with client')
             break
@@ -68,11 +83,18 @@ def listen_tcp():
     # Accept a connection
     global sock
     if is_socket_closed(sock):
-        print("Pinting sock: " + str(sock))
-        sock = create_connection(host='0.0.0.0', port=Network.COMMUNICATION_PORT.value)
+        print("Printing sock: " + str(sock))
+        sock = create_connection(host=Network.LOCAL_IP.value, port=Network.COMMUNICATION_PORT.value)
 
     # Start a thread to receive messages
     receive_thread = threading.Thread(target=receive_messages, args=(sock,))
     receive_thread.start()
 
     # print(is_socket_closed(client_socket))
+
+
+def received_message():
+    print('Looking for received message')
+    while True:
+        if len(msg)!=0:
+            return msg

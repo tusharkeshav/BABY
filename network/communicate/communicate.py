@@ -66,13 +66,17 @@ def receive_message():
     return peer_client.receive_messages()
 
 
-def discover_and_send_message(cmd=None):
+def discover_and_send_message(cmd=None, custom_id=None):
     # cmd = ''
-    device_id, ip_address = discover_device()
+    device_id, ip_address = listen(custom_id)
 
     if peer_client.is_socket_closed():
-        peer_client.tcp_server(host=ip_address, port=Network.COMMUNICATION_PORT.value)
-        if cmd is not None: send_message(cmd)
+        try:
+            peer_client.tcp_server(host=ip_address, port=Network.COMMUNICATION_PORT.value)
+            if cmd is not None: send_message(cmd)
+        except Exception as e:
+            print(f'Error while creating TCP connection. Host: {ip_address} '
+                  f'PORT: {Network.COMMUNICATION_PORT.value}')
     else:
         # Add baby feedback that you are already connected to device
         print('Socket is connected. Already connected to device.')

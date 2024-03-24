@@ -1,10 +1,12 @@
 import socket
 import threading
+import time
 
 from network.network_enums import Network
 from network.communicate import peer_server
 from network.discover.udp_broadcast import broadcast, close, broadcast_all_ip
 from network.discover.udp_listen import listen
+from utilities.watchdog import watch_dog
 
 """
 NOTE:
@@ -89,16 +91,23 @@ def broadcast_and_connect():
     _broadcast_device = threading.Thread(target=broadcast_device)
     _broadcast_device.start()
 
-    _tcp_listener = threading.Thread(target=peer_server.listen_tcp)
-    _tcp_listener.start()
+    def tcp_listener():
+        _tcp_listener = threading.Thread(target=peer_server.listen_tcp)
+        _tcp_listener.start()
+        return _tcp_listener
+
+    _tcp_listener = tcp_listener()
+
+    # Starting watchdog to ensure tcp listener is always running
+    watch_dog.watch(monitor=_tcp_listener, action=tcp_listener).start()
 
     # # Discover the signal
     # # Btw this need to be done only when user ask to send cmd to other device
-    # _discover_device = threading.Thread(target=discover_device)
+    # _discover_device = threading.Thread(monitor=discover_device)
     # _discover_device.start()
     #
     # # listen to receive reply from broadcast receiver
     # # We don't need terminate the UDP connection as without we can achieve our work
-    # _terminate_udp = threading.Thread(target=terminate_udp)
+    # _terminate_udp = threading.Thread(monitor=terminate_udp)
     # _terminate_udp.start()
 

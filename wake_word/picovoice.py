@@ -10,13 +10,17 @@ SECTION = 'picovoice'
 
 keyword_custom = ['hey baby']
 keyword_default = ['picovoice', 'bumblebee', 'ok google', 'alexa']
+keyword_default = ['picovoice']
 
 porcupine_custom = pvporcupine.create(access_key=get_config(SECTION, 'access_key'),
                                       keyword_paths=[get_config(section=SECTION, key='custom_wake_word_path')],
                                       keywords=keyword_custom)
+# porcupine_default = pvporcupine.create(access_key=get_config(SECTION, 'access_key'),
+#                                        model_path=get_config(SECTION, 'wake_word_default_model'),
+#                                        keywords=keyword_default, sensitivities=[0.4, 0.4, 0.4, 0.4])
 porcupine_default = pvporcupine.create(access_key=get_config(SECTION, 'access_key'),
                                        model_path=get_config(SECTION, 'wake_word_default_model'),
-                                       keywords=keyword_default, sensitivities=[0.4, 0.4, 0.4, 0.4])
+                                       keywords=keyword_default, sensitivities=[0.4])
 
 
 def detect_wake_word():
@@ -30,12 +34,12 @@ def detect_wake_word():
 
             detected_keyword_default = porcupine_default.process(recorded_frame)
             if detected_keyword_default >= 0:
-                log.debug(f'Detected keyword is: {keyword_default[detected_keyword_default]}')
+                print(f'Detected keyword is: {keyword_default[detected_keyword_default]}')
                 recoder.stop()
                 return True
             detected_keyword_custom = porcupine_custom.process(recorded_frame)
             if detected_keyword_custom >= 0:
-                log.debug(f'Detected keyword is: {keyword_custom[detected_keyword_custom]}')
+                print(f'Detected keyword is: {keyword_custom[detected_keyword_custom]}')
                 recoder.stop()
                 return True
 
@@ -45,4 +49,6 @@ def detect_wake_word():
         log.exception(f'Exception occurred while reading and analyzing. Exception: {e}')
     finally:
         recoder.delete()
+
+detect_wake_word()
 

@@ -12,7 +12,6 @@ from speech.text2speech import speak
 from utilities.custom_skill import load_custom_skill, check_intent_exist_csv
 from utilities.custom_skill_gui import add_skill
 from config.get_config import get_config
-from utilities.pre_checks import pre_checks
 from utilities.similar_image_display import display_result
 
 SUBMIT_JOB = ThreadPoolExecutor(max_workers=10)
@@ -69,6 +68,21 @@ def record_analyse() -> tuple:
     return intent, voice2json
 
 
+def analyse_intent_from_text(text: str):
+
+    voice2json = run_output(
+        '/usr/bin/voice2json recognize-intent --text-input "{text}"'.format(text=text))
+    json_pattern = r'\{.*\}'
+    json_extract = re.search(pattern=json_pattern, string=voice2json[1]).group()
+    voice2json = json.loads(json_extract)
+    log.info(f"Analysed command from text: {voice2json}")
+    if voice2json['text'] == '':
+        return None, None
+
+    intent = str(voice2json['intent']['name'])
+    return intent, voice2json
+
+
 def indentify_intent(force=True):
     """
     It will be used when its required for accuracy. For accuracy we will first send voice command
@@ -90,22 +104,26 @@ def broadcast_device():
     pass
 
 
-def voice_2_intent():
+def voice_2_intent(network_action=None):
     """
     Action that will be performed. In other words, it mainitain all the skills
     :return:
     """
-    pre_checks()
-    broadcast_device()
-    from utilities.listening_animation import get_data
+    if network_action is None:
+        from utilities.listening_animation import get_data
 
-    intent, voice2json = get_data(calling_func='voice2intent')
+        intent, voice2json = get_data(calling_func='voice2intent')
+        if intent is None:
+            return
+        if float(voice2json['likelihood']) == CONFIDENCE:
+            no_result()
+            return
+    else:
+        intent, voice2json = analyse_intent_from_text(text=network_action)
+
     log.info(f'intent is {intent}')
-    if intent is None:
-        return
-    if float(voice2json['likelihood']) == CONFIDENCE:
-        no_result()
-        return
+    print(f'intent is {intent}')
+
     if intent == 'Terminal':
         speak('Opening terminal')
         cmd = 'gnome-terminal'
@@ -297,7 +315,7 @@ def voice_2_intent():
 
     elif intent == 'SearchDevice':
         from network.communicate import peer_client, communicate
-        if peer_client.is_socket_closed(peer_client.sock):
+        if not peer_client.is_socket_closed(peer_client.sock):
             speak('You are already connect to device')
         else:
             speak('Discovering device over network')
