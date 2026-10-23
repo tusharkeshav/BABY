@@ -1,0 +1,57 @@
+# Secrets & Environment
+config.ini
+.env
+.env.*
+credentials/
+*.pem
+*.key
+*.token
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+.pytest_cache/
+
+# Large Model Binaries & Assets
+*.onnx
+*.onnx.json
+*.vrm
+*.glb
+speech/piper/models/
+speech/lib/
+wake_word/*.onnx
+
+# Temporary logs & debug renders
+logs/
+*.log
+tmp/
+*.png
+!img/**/*.png
+!img/**/*.gif
+!img/**/*.jpg
+user_chrome_window.png
+desktop_*.png
+test_render*.png
+tab_walk*.png
+reloaded_*.png
+direct_*.png
+fullscreen_*.png
+walk_frame*.png
+after_restore_close.png
+devtools.png
+console_walk.png
+test_drag.png
+CRASH_INVESTIGATION.md
