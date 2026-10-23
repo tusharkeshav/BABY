@@ -11,7 +11,7 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)](https://nodejs.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
+[![License: PolyForm Noncommercial](https://img.shields.io/badge/License-PolyForm%20Noncommercial-red.svg)](LICENSE)
 [![WhatsApp Multi-Device](https://img.shields.io/badge/WhatsApp-Baileys%20Bridge-25D366.svg?logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
 
 <p align="center">
@@ -40,14 +40,14 @@
 
 ```mermaid
 graph TD
-    User["📱 User (WhatsApp Mobile)"] <==>|Encrypted Multi-Device WebSocket| Sidecar["⚡ Baileys Bridge (Node.js Sidecar)<br/>connectors/providers/whatsapp/sidecar/"]
+    User["📱 User (WhatsApp Mobile)"] <==>|"Encrypted Multi-Device WebSocket"| Sidecar["⚡ Baileys Bridge (Node.js Sidecar)<br/>connectors/providers/whatsapp/sidecar/"]
     
-    Sidecar -->|HTTP POST :8766 (Webhook)| PyBridge["🐍 WhatsAppConnector (Python)<br/>connectors/providers/whatsapp/connector.py"]
+    Sidecar -->|"HTTP POST :8766 (Webhook)"| PyBridge["🐍 WhatsAppConnector (Python)<br/>connectors/providers/whatsapp/connector.py"]
     
     PyBridge --> Auth{"🔐 Sender Whitelist &<br/>Contact Resolver"}
     
-    Auth -- Verified --> Router["🎯 Intent & Skill Dispatcher"]
-    Auth -- Unknown --> Reject["🚫 Drop / Ignore Event"]
+    Auth -- "Verified" --> Router["🎯 Intent & Skill Dispatcher"]
+    Auth -- "Unknown" --> Reject["🚫 Drop / Ignore Event"]
 
     Router --> SkillBright["🔆 change_brightness.py"]
     Router --> SkillVol["🔊 volume.py"]
@@ -55,8 +55,8 @@ graph TD
     Router --> SkillApp["🚀 app_launcher.py"]
     Router -.-> Core["🔒 Core Neural Pipeline<br/>(Proprietary / Closed-Source)"]
 
-    Router -->|Async Speech| Speaker["🔊 Host PC Speakers (Piper TTS)"]
-    Router -->|JSON Confirmation| Sidecar
+    Router -->|"Async Speech"| Speaker["🔊 Host PC Speakers (Piper TTS)"]
+    Router -->|"JSON Confirmation"| Sidecar
 ```
 
 ---
@@ -127,12 +127,8 @@ Once paired, your phone is instantly connected to execute desktop commands!
 
 ---
 
-## 🔒 Security & Privacy Notice
+## 🔒 Security & License Notice
 * **Local Authentication Only**: All WhatsApp session credentials and auth keys are encrypted and stored solely on the local machine (`credentials/whatsapp_session/`).
 * **Zero Cloud Exposure**: Does not transmit private messages, audio clips, or personal data to third-party cloud servers.
+* **Non-Commercial License**: This project is licensed under the **PolyForm Noncommercial License 1.0.0** - commercial use, redistribution for profit, or commercial hosting is strictly prohibited. See [LICENSE](LICENSE) for full legal terms.
 * **Architecture Specification**: *Note: This repository contains the open modular interface and desktop connectors layer. Core proprietary neural voice models and backend weights are withheld.*
-
----
-
-## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

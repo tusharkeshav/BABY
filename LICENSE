@@ -1,21 +1,51 @@
-MIT License
+PolyForm Noncommercial License 1.0.0
 
-Copyright (c) 2023 Tushar keshav
+<https://polyformproject.org/licenses/noncommercial/1.0.0>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## Purpose
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This license allows use of this software for noncommercial purposes only.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## Agreement
+
+In order to receive this license, you have to agree to its rules. Those rules are
+both terms of your agreement and conditions to your license. Don't do anything
+with this software that violates the rules.
+
+## Notices
+
+You must ensure that everyone who gets a copy of any part of this software from
+you also gets the text of this license.
+
+## Noncommercial Purpose
+
+Any use of this software, including as part of another software product or
+service, requires that you do not use it for commercial advantage or monetary
+compensation.
+
+## Fair Use
+
+You may use this software under any legal principles that allow you to use
+copyrighted works without permission from the copyright owner, such as "fair
+use" in the United States.
+
+## No Other Rights
+
+This license does not grant you any patent rights, and you may not use any
+trademarks or logos of the licensor.
+
+## Defensive Termination
+
+If you make any claim that this software or any part of it infringes a patent,
+your license to this software ends immediately.
+
+## Disclaimer of Warranties
+
+The licensor gives the software as-is, with all faults and without any warranties
+of any kind, either express or implied, including warranties of merchantability,
+fitness for a particular purpose, and non-infringement.
+
+## Limitation of Liability
+
+The licensor will not be liable for any damages arising out of your use of this
+software, under any legal theory, to the fullest extent permitted by law.
